@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>자릿수와 함께하는 나눗셈</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="page">
+    <header class="header">
+      <h1>자릿수와 함께하는 나눗셈</h1>
+      <p class="lead">큰 수도 한 자리씩 차근차근 나누면 돼요. 지금은 <strong>어느 자리</strong>를 보고 있는지 함께 확인해 봐요.</p>
+    </header>
+
+    <section class="card concept" aria-labelledby="concept-title">
+      <h2 id="concept-title">자릿수란?</h2>
+      <p>숫자 한 자리마다 자리(위치)가 있어요. 오른쪽부터 <strong>일의 자리 → 십의 자리 → 백의 자리 → 천의 자리</strong> 순이에요. 같은 숫자라도 자리가 다르면 크기가 달라요.</p>
+      <div class="place-demo" id="placeDemo" aria-live="polite"></div>
+    </section>
+
+    <section class="card input-section" aria-labelledby="calc-title">
+      <h2 id="calc-title">나눗셈 풀기</h2>
+      <p class="hint"><strong>문제 생성</strong>을 누를 때마다 피제수·제수가 무작위로 정해져요. 그다음 <strong>단계별로 풀기</strong>로 풀이를 볼 수 있어요.</p>
+      <form class="form" id="divForm" novalidate>
+        <p class="problem-preview" id="problemPreview" aria-live="polite"></p>
+        <div class="form-actions">
+          <button type="button" class="btn ghost" id="btnGenerateProblem">문제 생성</button>
+          <button type="submit" class="btn primary" id="btnSolve">단계별로 풀기</button>
+        </div>
+      </form>
+    </section>
+
+    <section class="card result hidden" id="resultSection" aria-live="polite">
+      <div class="result-head">
+        <h2>단계별 풀이</h2>
+        <p class="answer" id="answerLine"></p>
+      </div>
+
+      <div class="step-nav">
+        <button type="button" class="btn ghost" id="prevStep" disabled>이전 단계</button>
+        <span class="step-counter" id="stepCounter"></span>
+        <button type="button" class="btn ghost" id="nextStep">다음 단계</button>
+      </div>
+
+      <div class="step-panel" id="stepPanel"></div>
+
+      <div class="long-division-wrap">
+        <div class="long-division" id="longDivision" aria-hidden="true"></div>
+      </div>
+    </section>
+
+    <footer class="footer">
+      <p>스스로 천천히 따라가 보세요. 막히면 선생님이나 부모님과 같이 보면 더 좋아요.</p>
+    </footer>
+  </div>
+  <script src="app.js"></script>
+</body>
+</html>
