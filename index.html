@@ -6,57 +6,119 @@
   <title>자릿수와 함께하는 나눗셈</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;600;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Jua&family=Noto+Sans+KR:wght@400;500;600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-  <div class="page">
+  <div class="page" id="pageRoot">
     <header class="header">
       <h1>자릿수와 함께하는 나눗셈</h1>
-      <p class="lead">큰 수도 한 자리씩 차근차근 나누면 돼요. 지금은 <strong>어느 자리</strong>를 보고 있는지 함께 확인해 봐요.</p>
+      <p class="lead">백 → 십 → 일 순서로 몫을 적고, 깜빡이는 자리를 보며 차근차근 풀어 보세요.</p>
     </header>
 
     <section class="card concept" aria-labelledby="concept-title">
       <h2 id="concept-title">자릿수란?</h2>
-      <p>숫자 한 자리마다 자리(위치)가 있어요. 오른쪽부터 <strong>일의 자리 → 십의 자리 → 백의 자리 → 천의 자리</strong> 순이에요. 같은 숫자라도 자리가 다르면 크기가 달라요.</p>
+      <p>숫자 한 자리마다 자리(위치)가 있어요. 오른쪽부터 <strong>일 → 십 → 백</strong> 순이에요. 색깔로 구분해 두었어요.</p>
       <div class="place-demo" id="placeDemo" aria-live="polite"></div>
     </section>
 
     <section class="card input-section" aria-labelledby="calc-title">
-      <h2 id="calc-title">나눗셈 풀기</h2>
-      <p class="hint"><strong>문제 생성</strong>을 누를 때마다 피제수·제수가 무작위로 정해져요. 그다음 <strong>단계별로 풀기</strong>로 풀이를 볼 수 있어요.</p>
+      <h2 id="calc-title">문제 만들기</h2>
+      <div class="difficulty-row" role="group" aria-label="난이도">
+        <button type="button" class="chip chip-diff active" data-diff="easy">쉬움</button>
+        <button type="button" class="chip chip-diff" data-diff="normal">보통</button>
+        <button type="button" class="chip chip-diff" data-diff="hard">어려움</button>
+      </div>
+      <p class="hint diff-desc" id="diffDesc">나누어지는 수 2자리 ÷ 나누는 수 1자리 · 나누어떨어지는 문제가 많아요.</p>
       <form class="form" id="divForm" novalidate>
         <p class="problem-preview" id="problemPreview" aria-live="polite"></p>
         <div class="form-actions">
           <button type="button" class="btn ghost" id="btnGenerateProblem">문제 생성</button>
-          <button type="submit" class="btn primary" id="btnSolve">단계별로 풀기</button>
+          <button type="button" class="btn ghost" id="btnWorksheet">학습지 제작하기</button>
+          <button type="submit" class="btn primary" id="btnStartPractice">여기서 풀기</button>
         </div>
       </form>
     </section>
 
-    <section class="card result hidden" id="resultSection" aria-live="polite">
-      <div class="result-head">
-        <h2>단계별 풀이</h2>
-        <p class="answer" id="answerLine"></p>
+    <section class="card practice-card hidden" id="practiceCard" aria-labelledby="practice-title">
+      <h2 id="practice-title">직접 풀기</h2>
+      <p class="phase-label" id="phaseLabel" aria-live="polite"></p>
+      <div class="step-dots" id="stepDots" aria-hidden="true"></div>
+
+      <div class="practice-align" id="practiceAlign">
+        <div class="practice-q-col">
+          <div id="quotientMount"></div>
+          <div class="long-division-wrap practice-ld">
+            <div class="long-division" id="longDivision" role="img" aria-label="세로 나눗셈"></div>
+          </div>
+        </div>
+        <p class="remainder-tip" id="remainderTip" hidden>
+          나누어떨어지지 않으면 몫을 모두 적은 뒤 <strong>나머지</strong>를 적어요.
+        </p>
       </div>
 
-      <div class="step-nav">
-        <button type="button" class="btn ghost" id="prevStep" disabled>이전 단계</button>
-        <span class="step-counter" id="stepCounter"></span>
-        <button type="button" class="btn ghost" id="nextStep">다음 단계</button>
+      <div class="remainder-block hidden" id="remainderBlock">
+        <label class="remainder-label">
+          <span>나머지</span>
+          <input type="text" id="remainderInput" class="quotient-inp remainder-inp" inputmode="numeric" maxlength="2" autocomplete="off" aria-label="나머지" />
+        </label>
       </div>
 
-      <div class="step-panel" id="stepPanel"></div>
-
-      <div class="long-division-wrap">
-        <div class="long-division" id="longDivision" aria-hidden="true"></div>
+      <div class="practice-actions">
+        <button type="button" class="btn ghost touch-lg" id="btnCheckAll">전체 정답 확인</button>
+        <button type="button" class="btn ghost touch-lg" id="btnNewFromPractice">다른 문제</button>
       </div>
+      <div class="practice-feedback" id="practiceFeedback" role="status" aria-live="polite"></div>
     </section>
 
-    <footer class="footer">
-      <p>스스로 천천히 따라가 보세요. 막히면 선생님이나 부모님과 같이 보면 더 좋아요.</p>
+    <footer class="footer footer-tip">
+      <p>막히면 곱셈 힌트를 보고, 같은 색으로 깜빡이는 <strong>나누어지는 수</strong> 자리를 짝지어 생각해 보세요.</p>
+    </footer>
+
+    <footer class="site-footer" aria-labelledby="site-footer-title">
+      <h2 id="site-footer-title" class="sr-only">사이트 운영 정보</h2>
+      <div class="site-footer-inner">
+        <p class="site-footer-line">
+          <strong>운영자</strong> 휘웅쌤 · 경기도교육청 소속 초등학교 교사
+        </p>
+        <p class="site-footer-line site-footer-sns">
+          <span class="sr-only">SNS</span>
+          <a class="sns-icon" href="https://blog.naver.com/ricky970327" target="_blank" rel="noopener noreferrer" title="Naver Blog" aria-label="Naver Blog">
+            <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><rect width="24" height="24" rx="5" fill="#03C75A"/><text x="12" y="17" text-anchor="middle" fill="#fff" font-size="14" font-weight="800" font-family="system-ui,sans-serif">N</text></svg>
+          </a>
+          <a class="sns-icon" href="https://www.instagram.com/hweewoong/" target="_blank" rel="noopener noreferrer" title="Instagram" aria-label="Instagram">
+            <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><defs><linearGradient id="ig" x1="0%" y1="100%" x2="100%" y2="0%"><stop offset="0%" stop-color="#f09433"/><stop offset="50%" stop-color="#e6683c"/><stop offset="100%" stop-color="#bc1888"/></linearGradient></defs><rect width="24" height="24" rx="6" fill="url(#ig)"/><rect x="5" y="5" width="14" height="14" rx="4" fill="none" stroke="#fff" stroke-width="1.6"/><circle cx="12" cy="12" r="3.2" fill="none" stroke="#fff" stroke-width="1.6"/><circle cx="16.5" cy="7.5" r="1" fill="#fff"/></svg>
+          </a>
+          <a class="sns-icon" href="https://www.youtube.com/@hweewoong" target="_blank" rel="noopener noreferrer" title="YouTube" aria-label="YouTube">
+            <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><rect width="24" height="24" rx="5" fill="#FF0000"/><path fill="#fff" d="M9.5 7.5v9l7.2-4.5-7.2-4.5z"/></svg>
+          </a>
+        </p>
+        <p class="site-footer-line">
+          <a href="mailto:ricky970327@naver.com">ricky970327@naver.com</a>
+          <span class="site-footer-sep">|</span>
+          Copyright ⓒ hweewoong. All Rights Reserved.
+        </p>
+        <p class="site-footer-cc">
+          hweewoong에 의해 작성된 <a href="https://www.easymath.kr" target="_blank" rel="noopener">easymath.kr</a> 웹사이트는
+          <a href="https://creativecommons.org/licenses/by-nd/2.0/kr/" target="_blank" rel="noopener noreferrer">크리에이티브 커먼즈 저작자표시-변경금지 2.0 대한민국 라이선스</a>에 따라 이용할 수 있습니다.
+        </p>
+      </div>
     </footer>
   </div>
+
+  <div id="worksheetOverlay" class="worksheet-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="wsTitle" aria-hidden="true">
+    <div class="worksheet-toolbar no-print">
+      <button type="button" class="btn ghost" id="wsRefresh">새로고침 · 다른 문제</button>
+      <button type="button" class="btn primary" id="wsPrint">인쇄 / PDF 저장</button>
+      <button type="button" class="btn ghost" id="wsClose">닫기</button>
+    </div>
+    <div class="worksheet-sheet-outer no-print">
+      <p class="worksheet-hint">아래 미리보기는 A4 인쇄에 맞춰져 있어요. <strong>인쇄 / PDF 저장</strong>으로 출력하세요.</p>
+    </div>
+    <div class="worksheet-sheet" id="worksheetSheet"></div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js" crossorigin="anonymous"></script>
   <script src="app.js"></script>
 </body>
 </html>

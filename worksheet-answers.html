@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>학습지 정답 확인 · easymath.kr</title>
+  <style>
+    :root {
+      --ink: #1a1a1a;
+      --muted: #5c5852;
+      --accent: #2d5a9e;
+      --bg: #f7f9fc;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "Noto Sans KR", system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--ink);
+      line-height: 1.6;
+      padding: 1.25rem;
+      min-height: 100vh;
+    }
+    h1 {
+      font-size: 1.15rem;
+      margin: 0 0 0.5rem;
+    }
+    .meta {
+      font-size: 0.85rem;
+      color: var(--muted);
+      margin-bottom: 1.25rem;
+    }
+    .err {
+      background: #fdecea;
+      color: #a32020;
+      padding: 1rem;
+      border-radius: 10px;
+      max-width: 36rem;
+    }
+    table {
+      width: 100%;
+      max-width: 32rem;
+      border-collapse: collapse;
+      background: #fff;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+    }
+    th, td {
+      padding: 0.55rem 0.65rem;
+      text-align: center;
+      border-bottom: 1px solid #e8e6e1;
+      font-size: 0.92rem;
+    }
+    th {
+      background: #eef3fb;
+      font-weight: 700;
+    }
+    tr:last-child td { border-bottom: none; }
+    .num { width: 2.5rem; color: var(--muted); }
+    .expr { text-align: left; font-variant-numeric: tabular-nums; }
+    footer {
+      margin-top: 2rem;
+      font-size: 0.78rem;
+      color: var(--muted);
+    }
+    a { color: var(--accent); }
+  </style>
+</head>
+<body>
+  <h1>학습지 정답</h1>
+  <p class="meta">QR로 연 이 페이지예요. 선생님·학부모 확인용입니다.</p>
+  <div id="root"></div>
+  <footer>
+    easymath.kr · <span id="footCopy"></span>
+  </footer>
+  <script>
+    (function () {
+      "use strict";
+      function decodePayload(hash) {
+        if (!hash || hash.length < 3) return null;
+        var raw = hash.charAt(0) === "#" ? hash.slice(1) : hash;
+        var m = raw.match(/^d=(.+)$/);
+        if (!m) return null;
+        try {
+          var b64 = decodeURIComponent(m[1].replace(/ /g, "+"));
+          return JSON.parse(atob(b64));
+        } catch (e) {
+          return null;
+        }
+      }
+
+      var root = document.getElementById("root");
+      var foot = document.getElementById("footCopy");
+      foot.textContent = "Copyright \u00a9 hweewoong.";
+
+      var data = decodePayload(location.hash);
+      if (!data || !data.a || !Array.isArray(data.a)) {
+        root.innerHTML =
+          '<p class="err">정답 데이터를 읽을 수 없어요. 학습지에 인쇄된 QR을 다시 스캔하거나, 같은 사이트에서 만든 학습지인지 확인해 주세요.</p>';
+        return;
+      }
+
+      var rows = data.a
+        .map(function (row, i) {
+          var d = row[0];
+          var s = row[1];
+          var q = row[2];
+          var r = row[3];
+          var expr = d + " \u00f7 " + s;
+          var ans = String(q) + (r > 0 ? " (나머지 " + r + ")" : "");
+          return (
+            "<tr><td class=\"num\">" +
+            (i + 1) +
+            '</td><td class="expr">' +
+            expr +
+            '</td><td class="ans">' +
+            ans +
+            "</td></tr>"
+          );
+        })
+        .join("");
+
+      root.innerHTML =
+        '<table><thead><tr><th class="num">번호</th><th>문제</th><th>몫 (나머지)</th></tr></thead><tbody>' +
+        rows +
+        "</tbody></table>";
+    })();
+  </script>
+</body>
+</html>
