@@ -388,62 +388,90 @@
     return out;
   }
 
-  var WS_RULER_SVG =
-    '<svg class="ws-ruler-svg" viewBox="0 0 32 40" width="20" height="26" aria-hidden="true">' +
-    '<polygon points="2,38 2,6 26,38" fill="rgba(170,210,255,0.35)" stroke="rgba(70,120,190,0.55)" stroke-width="1.1"/>' +
-    '<line x1="5" y1="30" x2="20" y2="30" stroke="rgba(70,120,190,0.4)" stroke-width="0.6" stroke-dasharray="1.5,2"/>' +
-    "</svg>";
-
-  var WS_MASCOT_SVG =
-    '<svg class="ws-mascot-svg" viewBox="0 0 110 76" width="76" height="52" aria-hidden="true">' +
-    '<ellipse cx="55" cy="68" rx="42" ry="7" fill="rgba(190,220,255,0.55)"/>' +
-    '<ellipse cx="48" cy="44" rx="26" ry="22" fill="#fdfdfd" stroke="#d0d0d0" stroke-width="1"/>' +
-    '<circle cx="48" cy="30" r="16" fill="#fdfdfd" stroke="#ccc" stroke-width="0.9"/>' +
-    '<ellipse cx="43" cy="28" rx="2.2" ry="2.8" fill="#2a2a2a"/>' +
-    '<ellipse cx="53" cy="28" rx="2.2" ry="2.8" fill="#2a2a2a"/>' +
-    '<path d="M44 36 Q48 39 52 36" fill="none" stroke="#333" stroke-width="0.9" stroke-linecap="round"/>' +
-    '<rect x="40" y="31" width="16" height="6" rx="0.8" fill="none" stroke="#666" stroke-width="0.7"/>' +
-    '<line x1="48" y1="31" x2="48" y2="37" stroke="#666" stroke-width="0.5"/>' +
-    '<rect x="72" y="48" width="14" height="10" rx="1" fill="#fff" stroke="#c9b87a" stroke-width="0.8"/>' +
-    '<line x1="74" y1="51" x2="84" y2="51" stroke="#ddd" stroke-width="0.5"/>' +
-    '<rect x="86" y="58" width="6" height="5" rx="1" fill="#e8e4dc" stroke="#aaa" stroke-width="0.5"/>' +
-    "</svg>";
+  var WS_ASSET = {
+    logo: "assets/ws-logo.png",
+    ruler: "assets/ws-ruler.png",
+    mascot: "assets/ws-mascot.png",
+  };
 
   function worksheetLdHtml(dividend, divisor) {
-    var dStr = String(dividend);
-    var digits = dStr
-      .split("")
-      .map(function (ch) {
-        return '<span class="ws-d">' + ch + "</span>";
-      })
-      .join("");
-    var slots = dStr
-      .split("")
-      .map(function () {
-        return "<span class=\"ws-qslot\"></span>";
-      })
-      .join("");
+    var st = buildSteps(dividend, divisor);
+    if (!st) return "";
+    var dStr = st.dividendStr;
+    var divStr = String(divisor);
+    var n = dStr.length;
+    var colCount = Math.max(6, divStr.length + 1 + n);
+    var rowCount = Math.max(6, 2 + st.steps.length * 2);
+
+    var dividendStart = colCount - n + 1;
+    var parenCol = dividendStart - 1;
+    var divisorStart = Math.max(1, parenCol - divStr.length);
+
+    var cellHtml = "";
+    for (var r = 1; r <= rowCount; r++) {
+      for (var c = 1; c <= colCount; c++) {
+        var topCls = r === 1 ? " is-top" : "";
+        var leftCls = c === 1 ? " is-left" : "";
+        cellHtml += '<span class="ws-grid-cell' + topCls + leftCls + '"></span>';
+      }
+    }
+
+    function placeDigits(text, row, startCol, cls) {
+      var h = "";
+      for (var i = 0; i < text.length; i++) {
+        h +=
+          '<span class="ws-digit ' +
+          cls +
+          '" style="grid-row:' +
+          row +
+          ";grid-column:" +
+          (startCol + i) +
+          ';">' +
+          text[i] +
+          "</span>";
+      }
+      return h;
+    }
+
+    var html = "";
+    var qSlotHtml = "";
+    for (var q = 0; q < n; q++) {
+      qSlotHtml +=
+        '<span class="ws-slot" style="grid-row:1;grid-column:' + (dividendStart + q) + ';"></span>';
+    }
+    html += qSlotHtml;
+    html += placeDigits(divStr, 2, divisorStart, "ws-digit-black");
+    html += placeDigits(dStr, 2, dividendStart, "ws-digit-black");
+    html +=
+      '<span class="ws-paren-char" style="grid-row:2;grid-column:' + parenCol + ';">)</span>';
+    html +=
+      '<span class="ws-topline" style="grid-row:2;grid-column:' +
+      dividendStart +
+      " / span " +
+      n +
+      ';"></span>';
+
+    for (var s = 0; s < st.steps.length; s++) {
+      var pRow = 3 + s * 2;
+      if (pRow > rowCount) break;
+      html +=
+        '<span class="ws-subline" style="grid-row:' +
+        pRow +
+        ";grid-column:" +
+        dividendStart +
+        " / span " +
+        n +
+        ';"></span>';
+    }
+
     return (
-      '<div class="ws-ld">' +
-      '<div class="ws-ld-stack">' +
-      '<div class="ws-ld-qblock">' +
-      '<div class="ws-ld-qrow">' +
-      slots +
-      "</div>" +
-      '<div class="ws-ld-qdash" aria-hidden="true"></div>' +
-      "</div>" +
-      '<div class="ws-ld-mid">' +
-      '<span class="ws-div">' +
-      divisor +
-      "</span>" +
-      '<span class="ws-paren">)</span>' +
-      '<div class="ws-dd">' +
-      digits +
-      "</div>" +
-      "</div>" +
-      '<div class="ws-ld-bar-main" aria-hidden="true"></div>' +
-      '<div class="ws-ld-workzone" aria-hidden="true"></div>' +
-      "</div>" +
+      '<div class="ws-problem-grid" style="--ws-cols:' +
+      colCount +
+      ";--ws-rows:" +
+      rowCount +
+      ';">' +
+      cellHtml +
+      html +
       "</div>"
     );
   }
@@ -487,11 +515,9 @@
       '<header class="ws-head">' +
       '<div class="ws-head-left">' +
       '<div class="ws-logo-wrap" aria-hidden="true">' +
-      '<span class="ws-spark ws-spark-tl">×</span>' +
-      '<span class="ws-spark ws-spark-tr">×</span>' +
-      '<span class="ws-spark ws-spark-bl">×</span>' +
-      '<span class="ws-spark ws-spark-br">×</span>' +
-      '<span class="ws-logo-text">쉬운수학</span>' +
+      '<img class="ws-logo-img" src="' +
+      WS_ASSET.logo +
+      '" alt="" />' +
       "</div>" +
       '<h1 class="ws-unit-title" id="wsTitle">1. 자릿수와 함께하는 나눗셈</h1>' +
       '<p class="ws-diff-line">난이도 : ' +
@@ -508,7 +534,9 @@
       "</header>" +
       '<div class="ws-body">' +
       '<div class="ws-ruler-col">' +
-      WS_RULER_SVG +
+      '<img class="ws-ruler-img" src="' +
+      WS_ASSET.ruler +
+      '" alt="" />' +
       "</div>" +
       '<div class="ws-problems-wrap">' +
       '<div class="ws-problems">' +
@@ -523,7 +551,9 @@
       '<div id="wsQr"></div>' +
       "</div>" +
       '<div class="ws-foot-mascot">' +
-      WS_MASCOT_SVG +
+      '<img class="ws-mascot-img" src="' +
+      WS_ASSET.mascot +
+      '" alt="" />' +
       "</div>" +
       "</footer>" +
       "</div>" +

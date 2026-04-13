@@ -1,3 +1,13 @@
+@font-face {
+  font-family: "Katuri";
+  src:
+    url("assets/fonts/Katuri.otf") format("opentype"),
+    url("assets/fonts/Katuri.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
 :root {
   --bg: #f0f7ff;
   --card: #ffffff;
@@ -1187,56 +1197,19 @@ body.worksheet-open {
 }
 
 .ws-logo-wrap {
-  position: relative;
   display: inline-block;
-  margin-bottom: 0.15rem;
-  padding: 0.15rem 0.35rem;
+  margin-bottom: 0.18rem;
 }
 
-.ws-spark {
-  position: absolute;
-  font-size: 0.55rem;
-  font-weight: 800;
-  color: #5ba3f5;
-  line-height: 1;
-  font-family: system-ui, sans-serif;
-}
-
-.ws-spark-tl {
-  top: -0.05rem;
-  left: -0.1rem;
-}
-
-.ws-spark-tr {
-  top: -0.05rem;
-  right: -0.1rem;
-}
-
-.ws-spark-bl {
-  bottom: -0.05rem;
-  left: -0.1rem;
-}
-
-.ws-spark-br {
-  bottom: -0.05rem;
-  right: -0.1rem;
-}
-
-.ws-logo-text {
-  font-family: Jua, "Noto Sans KR", cursive, sans-serif;
-  font-size: clamp(1.65rem, 4.5vw, 2.15rem);
-  font-weight: 400;
-  letter-spacing: -0.04em;
-  line-height: 1.05;
-  color: #ff4f96;
-  text-shadow:
-    0 0 0 1.5px #fff,
-    0 0 0 3px #1f1f1f,
-    2px 3px 0 rgba(216, 27, 96, 0.35);
+.ws-logo-img {
+  display: block;
+  width: clamp(8rem, 23vw, 11rem);
+  height: auto;
+  object-fit: contain;
 }
 
 .ws-unit-title {
-  font-family: Jua, "Noto Sans KR", sans-serif;
+  font-family: "Katuri", Jua, "Noto Sans KR", sans-serif;
   font-size: clamp(0.88rem, 2.4vw, 1.02rem);
   font-weight: 400;
   margin: 0 0 0.1rem;
@@ -1245,9 +1218,10 @@ body.worksheet-open {
 }
 
 .ws-diff-line {
+  font-family: "Katuri", "Noto Sans KR", sans-serif;
   margin: 0;
   font-size: 0.72rem;
-  font-weight: 600;
+  font-weight: 400;
   color: #333;
 }
 
@@ -1286,8 +1260,12 @@ body.worksheet-open {
   opacity: 0.95;
 }
 
-.ws-ruler-svg {
+.ws-ruler-img {
   display: block;
+  width: 16px;
+  height: auto;
+  object-fit: contain;
+  opacity: 0.95;
 }
 
 .ws-problems-wrap {
@@ -1315,131 +1293,83 @@ body.worksheet-open {
 
 /* PDF: 연한 회색 점선 격자 작업칸 */
 .ws-grid-bg {
-  background-color: #fafcfd;
-  background-image:
-    repeating-linear-gradient(
-      0deg,
-      transparent,
-      transparent 7px,
-      rgba(100, 120, 140, 0.14) 7px,
-      rgba(100, 120, 140, 0.14) 8px
-    ),
-    repeating-linear-gradient(
-      90deg,
-      transparent,
-      transparent 7px,
-      rgba(100, 120, 140, 0.14) 7px,
-      rgba(100, 120, 140, 0.14) 8px
-    );
   border-radius: 2px;
-  padding: 4px 5px 5px;
+  padding: 2px;
   border: 1px solid rgba(90, 110, 130, 0.2);
 }
 
-.ws-ld {
+.ws-problem-grid {
+  --ws-dash-color: rgba(80, 92, 106, 0.55);
+  --ws-dash-stroke: 1.4px dashed var(--ws-dash-color);
+  --ws-cols: 6;
+  --ws-rows: 6;
+  display: grid;
+  grid-template-columns: repeat(var(--ws-cols), 1fr);
+  grid-template-rows: repeat(var(--ws-rows), 1fr);
+  aspect-ratio: calc(var(--ws-cols) / var(--ws-rows));
+  width: 100%;
   font-family: ui-monospace, "Cascadia Code", monospace;
-  font-size: 0.58rem;
-  line-height: 1.2;
-}
-
-.ws-ld-stack {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  width: 100%;
-}
-
-.ws-ld-qblock {
-  width: 100%;
-  max-width: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-}
-
-.ws-ld-qrow {
-  display: flex;
-  justify-content: flex-end;
-  gap: 0.1rem;
-  min-height: 0.62rem;
-  padding-right: 0.05rem;
-}
-
-/* 몫 자리 안내: 파란 점선 (PDF) */
-.ws-qslot {
-  display: inline-block;
-  width: 0.52rem;
-  height: 0.58rem;
-  border-bottom: 1px dashed #2a6fd4;
-  box-sizing: border-box;
-}
-
-.ws-ld-qdash {
-  width: 100%;
-  max-width: 5.2rem;
-  margin-top: 1px;
-  border-bottom: 1px dashed #4a8ee8;
-  opacity: 0.9;
-}
-
-.ws-ld-mid {
-  display: flex;
-  align-items: flex-end;
-  flex-wrap: nowrap;
-  gap: 0.05rem;
-  margin-top: 2px;
-}
-
-.ws-div {
-  font-weight: 800;
-  color: #111;
-}
-
-.ws-paren {
-  font-size: 0.74rem;
-  font-weight: 600;
-  color: #111;
-  margin-right: 0.03rem;
+  font-size: 0.66rem;
   line-height: 1;
+  background: #f9fbfc;
 }
 
-.ws-dd {
-  display: flex;
-  gap: 0.08rem;
-  border-top: 1.5px solid #111;
-  padding-top: 1px;
+.ws-grid-cell {
+  border-right: var(--ws-dash-stroke);
+  border-bottom: var(--ws-dash-stroke);
 }
 
-.ws-d {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 0.52rem;
+.ws-grid-cell.is-top {
+  border-top: var(--ws-dash-stroke);
+}
+
+.ws-grid-cell.is-left {
+  border-left: var(--ws-dash-stroke);
+}
+
+.ws-slot {
+  align-self: end;
+  justify-self: center;
+  width: 78%;
+  border-bottom: var(--ws-dash-stroke);
+}
+
+.ws-digit {
+  align-self: center;
+  justify-self: center;
   font-weight: 800;
-  color: #111;
+  color: #1b1b1b;
 }
 
-/* 나눗셈 첫 빼기 줄 실선 */
-.ws-ld-bar-main {
-  width: 100%;
-  max-width: 5.5rem;
-  margin-top: 3px;
-  border-top: 1px solid #111;
+.ws-digit-black {
+  color: #222;
 }
 
-/* 풀이칸 안 가로 안내선 */
-.ws-ld-workzone {
-  width: 100%;
-  max-width: 5.5rem;
-  min-height: 2.1rem;
-  margin-top: 2px;
-  background: repeating-linear-gradient(
-    to bottom,
-    transparent,
-    transparent 11px,
-    rgba(160, 175, 190, 0.35) 11px,
-    rgba(160, 175, 190, 0.35) 12px
-  );
+.ws-paren-char {
+  align-self: center;
+  justify-self: center;
+  font-family: "Times New Roman", Georgia, serif;
+  font-size: 1.35rem;
+  font-weight: 500;
+  color: #1f1f1f;
+  line-height: 1;
+  transform: translateX(-1px) scaleY(1.12);
+}
+
+.ws-topline {
+  align-self: start;
+  justify-self: center;
+  width: calc(100% - 2px);
+  border-top: 2px solid #1a1a1a;
+  margin-top: 1px;
+}
+
+.ws-subline {
+  align-self: end;
+  justify-self: center;
+  width: calc(100% - 2px);
+  border-bottom: 2px solid #1a1a1a;
+  margin-bottom: 1px;
 }
 
 .ws-page-foot {
@@ -1485,8 +1415,11 @@ body.worksheet-open {
   line-height: 0;
 }
 
-.ws-mascot-svg {
+.ws-mascot-img {
   display: block;
+  width: 72px;
+  height: auto;
+  object-fit: contain;
 }
 
 .ws-qr-fallback {
