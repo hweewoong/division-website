@@ -371,7 +371,7 @@
     hidePractice();
   }
 
-  var WS_COUNT = 12;
+  var WS_COUNT = 9;
 
   function generateUniqueProblems(d, count) {
     var seen = Object.create(null);
@@ -401,19 +401,29 @@
     var divStr = String(divisor);
     var n = dStr.length;
     var colCount = Math.max(6, divStr.length + 1 + n);
-    var rowCount = Math.max(6, 2 + st.steps.length * 2);
+    /* 학습지는 풀이칸을 일정하게 보여 주기 위해 6행 고정 */
+    var rowCount = 6;
 
     var dividendStart = colCount - n + 1;
     var parenCol = dividendStart - 1;
     var divisorStart = Math.max(1, parenCol - divStr.length);
 
-    var cellHtml = "";
-    for (var r = 1; r <= rowCount; r++) {
-      for (var c = 1; c <= colCount; c++) {
-        var topCls = r === 1 ? " is-top" : "";
-        var leftCls = c === 1 ? " is-left" : "";
-        cellHtml += '<span class="ws-grid-cell' + topCls + leftCls + '"></span>';
-      }
+    var gridLineHtml = "";
+    for (var vc = 1; vc < colCount; vc++) {
+      gridLineHtml +=
+        '<span class="ws-grid-v" style="grid-column:' +
+        (vc + 1) +
+        ";grid-row:1 / span " +
+        rowCount +
+        ';"></span>';
+    }
+    for (var hr = 1; hr < rowCount; hr++) {
+      gridLineHtml +=
+        '<span class="ws-grid-h" style="grid-row:' +
+        (hr + 1) +
+        ";grid-column:1 / span " +
+        colCount +
+        ';"></span>';
     }
 
     function placeDigits(text, row, startCol, cls) {
@@ -470,7 +480,7 @@
       ";--ws-rows:" +
       rowCount +
       ';">' +
-      cellHtml +
+      gridLineHtml +
       html +
       "</div>"
     );

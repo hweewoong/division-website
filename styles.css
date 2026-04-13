@@ -1276,6 +1276,7 @@ body.worksheet-open {
 .ws-problems {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(3, 1fr);
   gap: 0.42rem 0.5rem;
 }
 
@@ -1299,38 +1300,39 @@ body.worksheet-open {
 }
 
 .ws-problem-grid {
-  --ws-dash-color: rgba(80, 92, 106, 0.55);
-  --ws-dash-stroke: 1.4px dashed var(--ws-dash-color);
+  --ws-dash-color: #98a1ad;
+  --ws-dash-stroke: 1.6px dashed var(--ws-dash-color);
   --ws-cols: 6;
   --ws-rows: 6;
   display: grid;
   grid-template-columns: repeat(var(--ws-cols), 1fr);
   grid-template-rows: repeat(var(--ws-rows), 1fr);
-  aspect-ratio: calc(var(--ws-cols) / var(--ws-rows));
+  aspect-ratio: 1.03 / 1;
   width: 100%;
   font-family: ui-monospace, "Cascadia Code", monospace;
-  font-size: 0.66rem;
+  font-size: 0.78rem;
   line-height: 1;
   background: #f9fbfc;
 }
 
-.ws-grid-cell {
-  border-right: var(--ws-dash-stroke);
-  border-bottom: var(--ws-dash-stroke);
-}
-
-.ws-grid-cell.is-top {
-  border-top: var(--ws-dash-stroke);
-}
-
-.ws-grid-cell.is-left {
+.ws-grid-v {
+  align-self: stretch;
+  justify-self: start;
+  width: 0;
   border-left: var(--ws-dash-stroke);
+}
+
+.ws-grid-h {
+  align-self: start;
+  justify-self: stretch;
+  height: 0;
+  border-top: var(--ws-dash-stroke);
 }
 
 .ws-slot {
   align-self: end;
   justify-self: center;
-  width: 78%;
+  width: 80%;
   border-bottom: var(--ws-dash-stroke);
 }
 
@@ -1339,6 +1341,7 @@ body.worksheet-open {
   justify-self: center;
   font-weight: 800;
   color: #1b1b1b;
+  font-size: 1.02em;
 }
 
 .ws-digit-black {
@@ -1349,11 +1352,11 @@ body.worksheet-open {
   align-self: center;
   justify-self: center;
   font-family: "Times New Roman", Georgia, serif;
-  font-size: 1.35rem;
+  font-size: 1.52rem;
   font-weight: 500;
   color: #1f1f1f;
   line-height: 1;
-  transform: translateX(-1px) scaleY(1.12);
+  transform: translateX(-1px) scaleY(1.16);
 }
 
 .ws-topline {
@@ -1367,7 +1370,7 @@ body.worksheet-open {
 .ws-subline {
   align-self: end;
   justify-self: center;
-  width: calc(100% - 2px);
+  width: calc(100% - 3px);
   border-bottom: 2px solid #1a1a1a;
   margin-bottom: 1px;
 }
@@ -1474,7 +1477,58 @@ body.worksheet-open {
   }
 
   .ws-a4 {
-    padding: 6mm 7mm;
+    padding: 5.5mm 6.2mm;
+  }
+
+  .ws-page-frame {
+    padding: 4mm 4.4mm 3.4mm;
+  }
+
+  .ws-head {
+    margin-bottom: 2.1mm;
+    gap: 0.35rem 0.7rem;
+  }
+
+  .ws-body {
+    margin-bottom: 1.6mm;
+  }
+
+  .ws-problems {
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(3, 1fr);
+    gap: 0.34rem 0.42rem;
+  }
+
+  .ws-bullet {
+    margin-bottom: 0.07rem;
+    font-size: 0.66rem;
+  }
+
+  .ws-grid-bg {
+    padding: 2.4px;
+  }
+
+  .ws-page-foot {
+    margin-top: 1.5mm;
+    padding-top: 0.9mm;
+  }
+
+  .ws-foot-copy {
+    font-size: 0.56rem;
+  }
+
+  .ws-qr-label {
+    font-size: 0.58rem;
+    margin-bottom: 0.05rem;
+  }
+
+  .ws-foot-qr img {
+    width: 56px;
+    height: 56px;
+  }
+
+  .ws-mascot-img {
+    width: 64px;
   }
 
   @page {
