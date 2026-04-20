@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Edishorts Factory · 내가 만드는 두 양 사이의 대응 관계</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body class="ef-site">
+  <div class="portal-topnav-wrap ef-nav">
+    <nav class="portal-topnav" aria-label="상단 탐색">
+      <a href="index.html" class="portal-logo-mini">Edishorts Factory</a>
+      <div class="portal-topnav-links">
+        <div class="portal-dropdown">
+          <button type="button" class="portal-dropbtn">학년</button>
+          <div class="portal-dropdown-menu">
+            <a href="index.html#explore">1학년</a><a href="index.html#explore">2학년</a><a href="index.html#explore">3학년</a>
+            <a href="index.html#explore">4학년</a><a href="index.html#explore">5학년</a><a href="index.html#explore">6학년</a>
+          </div>
+        </div>
+        <div class="portal-dropdown">
+          <button type="button" class="portal-dropbtn">학기</button>
+          <div class="portal-dropdown-menu portal-dropdown-menu-wide">
+            <a href="index.html#explore">1학년 1학기</a><a href="index.html#explore">1학년 2학기</a>
+            <a href="index.html#explore">2학년 1학기</a><a href="index.html#explore">2학년 2학기</a>
+            <a href="index.html#explore">3학년 1학기</a><a href="index.html#explore">3학년 2학기</a>
+            <a href="index.html#explore">4학년 1학기</a><a href="index.html#explore">4학년 2학기</a>
+            <a href="index.html#explore">5학년 1학기</a><a href="correspondence.html">5학년 2학기</a>
+            <a href="index.html#explore">6학년 1학기</a><a href="index.html#explore">6학년 2학기</a>
+          </div>
+        </div>
+        <div class="portal-dropdown">
+          <button type="button" class="portal-dropbtn">단원</button>
+          <div class="portal-dropdown-menu">
+            <span class="portal-dropdown-empty">규칙과 대응</span>
+          </div>
+        </div>
+      </div>
+      <div class="portal-topnav-pages">
+        <a href="notices.html">공지</a>
+        <a href="about.html">소개</a>
+        <a href="license.html">라이선스</a>
+      </div>
+    </nav>
+  </div>
+
+  <main class="corr-page">
+    <header class="corr-header">
+      <p class="corr-chip">5학년 2학기 · 규칙과 대응</p>
+      <h1>내가 만드는 두 양 사이의 대응 관계</h1>
+      <p>보고 → 생성하고 → 표로 정리하고 → 식으로 표현하고 → 말로 설명하는 흐름으로 학습해요.</p>
+    </header>
+    <div id="correspondenceApp"></div>
+  </main>
+
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <script type="text/babel">
+    const { useMemo, useState } = React;
+
+    const PAIR_OPTIONS = [
+      {
+        id: "sunflower",
+        sourceLabel: "해바라기",
+        targetLabel: "해바라기 노란색 꽃잎",
+        image: "assets/해바라기-해바라기 노란색 꽃잎.png",
+        unitType: "petal"
+      },
+      {
+        id: "grape",
+        sourceLabel: "포도",
+        targetLabel: "포도알",
+        image: "assets/포도-포도알.png",
+        unitType: "grape"
+      },
+      {
+        id: "chair",
+        sourceLabel: "의자",
+        targetLabel: "의자 다리",
+        image: "assets/의자-의자 다리.png",
+        unitType: "leg"
+      },
+      {
+        id: "crocodile",
+        sourceLabel: "악어",
+        targetLabel: "악어 이빨",
+        image: "assets/악어-악어 이빨.png",
+        unitType: "tooth"
+      }
+    ];
+
+    const SYMBOLS = ["●", "▲", "■", "★", "❤", "⬟"];
+    const OPERATORS = ["+", "-", "×", "÷"];
+
+    function randomInt(min, max) {
+      return min + Math.floor(Math.random() * (max - min + 1));
+    }
+
+    function pickRandomRatio(prev, level) {
+      let min = 1;
+      let max = 6;
+      if (level === "normal") {
+        min = 7;
+        max = 99;
+      } else if (level === "hard") {
+        min = 100;
+        max = 999;
+      }
+      let next = prev;
+      let guard = 0;
+      while (next === prev && guard < 12) {
+        next = randomInt(min, max);
+        guard += 1;
+      }
+      return next;
+    }
+
+    function createBaseNumbers() {
+      const rest = [];
+      const used = new Set([1, 2, 3]);
+      while (rest.length < 7) {
+        const candidate = 4 + Math.floor(Math.random() * 17);
+        if (!used.has(candidate)) {
+          used.add(candidate);
+          rest.push(candidate);
+        }
+      }
+      rest.sort((a, b) => a - b);
+      return [1, 2, 3, ...rest];
+    }
+
+    function App() {
+      const [selectedPairId, setSelectedPairId] = useState("");
+      const [ratio, setRatio] = useState(3);
+      const [createdCount, setCreatedCount] = useState(1);
+      const [baseNumbers, setBaseNumbers] = useState(createBaseNumbers);
+      const [inputValues, setInputValues] = useState(Array(10).fill(""));
+      const [tableChecked, setTableChecked] = useState(false);
+      const [wrongIndexes, setWrongIndexes] = useState([]);
+      const [tableFeedback, setTableFeedback] = useState("");
+      const [difficulty, setDifficulty] = useState("easy");
+      const [symbolA, setSymbolA] = useState("●");
+      const [symbolB, setSymbolB] = useState("▲");
+      const [lhsVar, setLhsVar] = useState("target");
+      const [rhsVar, setRhsVar] = useState("base");
+      const [operator, setOperator] = useState("×");
+      const [constant, setConstant] = useState(3);
+      const [finalFeedback, setFinalFeedback] = useState("");
+      const [finalSentence, setFinalSentence] = useState("");
+      const [showCelebrate, setShowCelebrate] = useState(false);
+
+      const selectedPair = PAIR_OPTIONS.find((it) => it.id === selectedPairId);
+      const hasPair = !!selectedPair;
+
+      const cards = useMemo(() => {
+        if (!hasPair) return [];
+        return Array.from({ length: createdCount }, (_, i) => i + 1);
+      }, [createdCount, hasPair]);
+
+      const currentStep = useMemo(() => {
+        if (finalSentence) return 4;
+        if (tableChecked) return 3;
+        if (hasPair) return 2;
+        return 1;
+      }, [finalSentence, tableChecked, hasPair]);
+
+      function choosePair(id) {
+        setFinalSentence("");
+        setFinalFeedback("");
+        setTableChecked(false);
+        setWrongIndexes([]);
+        setTableFeedback("");
+        setInputValues(Array(10).fill(""));
+        setBaseNumbers(createBaseNumbers());
+        setShowCelebrate(false);
+        setCreatedCount(1);
+        setSelectedPairId(id);
+      }
+
+      function handleGenerate() {
+        if (!hasPair) return;
+        setCreatedCount((v) => Math.min(v + 1, 10));
+      }
+
+      function handleRegenerate() {
+        if (!hasPair) return;
+        const next = pickRandomRatio(ratio, difficulty);
+        setRatio(next);
+        setConstant(next);
+        setTableChecked(false);
+        setWrongIndexes([]);
+        setTableFeedback("대응 규칙이 바뀌었어요. 표를 다시 확인해 보세요.");
+        setFinalSentence("");
+        setFinalFeedback("");
+        setInputValues(Array(10).fill(""));
+        setBaseNumbers(createBaseNumbers());
+      }
+
+      function updateInput(idx, value) {
+        const normalized = value.replace(/[^0-9]/g, "");
+        const next = inputValues.slice();
+        next[idx] = normalized;
+        setInputValues(next);
+        if (wrongIndexes.includes(idx)) {
+          setWrongIndexes(wrongIndexes.filter((v) => v !== idx));
+        }
+      }
+
+      function checkTableAnswer() {
+        if (!hasPair) {
+          setTableFeedback("먼저 두 양을 선택해 주세요.");
+          return;
+        }
+        const incorrect = baseNumbers
+          .map((num, idx) => (Number(inputValues[idx]) === num * ratio ? -1 : idx))
+          .filter((idx) => idx !== -1);
+        const isCorrect = incorrect.length === 0;
+        if (isCorrect) {
+          setTableChecked(true);
+          setWrongIndexes([]);
+          setTableFeedback("정답입니다. 이제 아래에서 식으로 표현해 보세요.");
+        } else {
+          setTableChecked(false);
+          setWrongIndexes(incorrect);
+          setFinalSentence("");
+          setFinalFeedback("");
+          setTableFeedback("아직 오답이 있어요. 대응 규칙을 다시 살펴보세요.");
+        }
+      }
+
+      function evaluateFormula(baseValue, targetValue) {
+        const lhs = lhsVar === "target" ? targetValue : baseValue;
+        const rhsBase = rhsVar === "target" ? targetValue : baseValue;
+        let result = 0;
+        if (operator === "+") result = rhsBase + Number(constant);
+        if (operator === "-") result = rhsBase - Number(constant);
+        if (operator === "×") result = rhsBase * Number(constant);
+        if (operator === "÷") result = rhsBase / Number(constant);
+        return Math.abs(lhs - result) < 1e-8;
+      }
+
+      function checkFinalFormula() {
+        if (!tableChecked || !hasPair) {
+          setFinalFeedback("먼저 표의 정답을 맞혀서 단계 잠금을 해제해 주세요.");
+          return;
+        }
+        if (operator === "÷" && Number(constant) === 0) {
+          setFinalFeedback("0으로 나눌 수 없어요. 다른 수를 넣어 보세요.");
+          return;
+        }
+        const formulaCorrect = [1, 2, 3, 4, 5].every((baseValue) => {
+          const targetValue = baseValue * ratio;
+          return evaluateFormula(baseValue, targetValue);
+        });
+        if (!formulaCorrect) {
+          setFinalSentence("");
+          setFinalFeedback("식을 다시 확인해 보세요. 대응 관계와 맞지 않아요.");
+          return;
+        }
+        setFinalFeedback("최종 정답입니다.");
+        setShowCelebrate(true);
+        setFinalSentence(
+          `${selectedPair.sourceLabel} 1개에 ${selectedPair.targetLabel}이(가) ${ratio}개씩 대응됩니다. ` +
+          `${selectedPair.sourceLabel}의 수가 1 늘어날 때마다 ${selectedPair.targetLabel}은(는) ${ratio}개씩 늘어납니다.`
+        );
+      }
+
+      const lhsSymbol = lhsVar === "target" ? symbolB : symbolA;
+      const rhsSymbol = rhsVar === "target" ? symbolB : symbolA;
+      const sourceName = selectedPair ? selectedPair.sourceLabel : "기준 양";
+      const targetName = selectedPair ? selectedPair.targetLabel : "대응 양";
+
+      return (
+        <div className="corr-app">
+          <section className="corr-panel corr-progress">
+            <h2>학습 진행 단계</h2>
+            <ol className="corr-progress-list" aria-label="학습 진행 상태">
+              {["선택", "표 작성", "식 만들기", "설명 확인"].map((label, idx) => {
+                const stepNo = idx + 1;
+                const stateClass =
+                  currentStep === stepNo ? "is-current" : currentStep > stepNo ? "is-done" : "";
+                return (
+                  <li key={label} className={`corr-progress-step ${stateClass}`}>
+                    <span className="corr-progress-dot">{stepNo}</span>
+                    <span>{label}</span>
+                  </li>
+                );
+              })}
+            </ol>
+          </section>
+
+          <section className="corr-panel corr-board">
+            <h2>1) 대응 관계 선택 영역</h2>
+            <p className="corr-tip">고정된 대응쌍을 하나 선택한 뒤 생성/재생성으로 관계를 탐색해 보세요.</p>
+            <div className="corr-difficulty-row" role="group" aria-label="난이도 선택">
+              <button
+                type="button"
+                className={`corr-difficulty-btn ${difficulty === "easy" ? "is-active" : ""}`}
+                onClick={() => setDifficulty("easy")}
+              >
+                쉬움(1~6)
+              </button>
+              <button
+                type="button"
+                className={`corr-difficulty-btn ${difficulty === "normal" ? "is-active" : ""}`}
+                onClick={() => setDifficulty("normal")}
+              >
+                보통(7~99)
+              </button>
+              <button
+                type="button"
+                className={`corr-difficulty-btn ${difficulty === "hard" ? "is-active" : ""}`}
+                onClick={() => setDifficulty("hard")}
+              >
+                어려움(100~999)
+              </button>
+            </div>
+            <div className="corr-select-grid">
+              {PAIR_OPTIONS.map((pair) => (
+                <button
+                  key={pair.id}
+                  type="button"
+                  className={`corr-choice corr-choice-pair ${selectedPairId === pair.id ? "is-active" : ""}`}
+                  onClick={() => choosePair(pair.id)}
+                >
+                  <img src={pair.image} alt={`${pair.sourceLabel}와 ${pair.targetLabel}`} className="corr-choice-image" />
+                  <span>{pair.sourceLabel} - {pair.targetLabel}</span>
+                </button>
+              ))}
+            </div>
+            <div className="corr-action-row">
+              <button type="button" className="btn primary" onClick={handleGenerate} disabled={!hasPair}>생성</button>
+              <button type="button" className="btn ghost" onClick={handleRegenerate} disabled={!hasPair}>재생성</button>
+            </div>
+            <div className="corr-stage">
+              {!hasPair ? (
+                <p className="corr-placeholder">대응쌍을 선택하면 시각화가 시작됩니다.</p>
+              ) : (
+                <>
+                  <p className="corr-rule">{selectedPair.sourceLabel} 1개 ↔ {selectedPair.targetLabel} {ratio}개</p>
+                  <div className="corr-card-wrap">
+                    {cards.map((n) => (
+                      <div className="corr-object-card" key={n}>
+                        <div className="corr-object-composite">
+                          <img
+                            src={selectedPair.image}
+                            alt={`${selectedPair.sourceLabel}와 ${selectedPair.targetLabel} 대응`}
+                            className="corr-object-main-image"
+                          />
+                          <div className="corr-attach-zone" aria-hidden="true">
+                            {Array.from({ length: ratio }, (_, idx) => (
+                              <span key={idx} className={`corr-unit corr-unit-${selectedPair.unitType}`}></span>
+                            ))}
+                          </div>
+                        </div>
+                        <p className="corr-sub-caption">{selectedPair.targetLabel} {ratio}개</p>
+                      </div>
+                    ))}
+                  </div>
+                </>
+              )}
+            </div>
+          </section>
+
+          <section className="corr-panel">
+            <h2>2) 대응 관계 표</h2>
+            <p className="corr-tip">아래 표를 채우고 정답 확인을 눌러 보세요.</p>
+            <div className="corr-table-shell">
+              <table className="corr-table">
+                <tbody>
+                  <tr>
+                    <th>{selectedPair ? selectedPair.sourceLabel : "첫 번째 양"}</th>
+                    {baseNumbers.map((num, idx) => <td key={`base-${idx}`}>{num}</td>)}
+                  </tr>
+                  <tr>
+                    <th>{selectedPair ? selectedPair.targetLabel : "두 번째 양"}</th>
+                    {inputValues.map((value, idx) => (
+                      <td key={`input-${idx}`}>
+                        <input
+                          className={wrongIndexes.includes(idx) ? "is-wrong" : ""}
+                          inputMode="numeric"
+                          value={value}
+                          onChange={(e) => updateInput(idx, e.target.value)}
+                          aria-label={`${idx + 1}번째 대응값 입력`}
+                        />
+                      </td>
+                    ))}
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div className="corr-action-row">
+              <button type="button" className="btn primary" onClick={checkTableAnswer}>정답 확인</button>
+            </div>
+            <p className={`corr-feedback ${tableChecked ? "is-good" : "is-warn"}`}>{tableFeedback}</p>
+          </section>
+
+          <section className={`corr-panel ${tableChecked ? "" : "is-locked"}`}>
+            <h2>3) 식으로 표현하기</h2>
+            <p className="corr-tip">위에서 고른 양 이름으로 자동 적용됩니다. 기호를 골라 식을 만들고 최종 정답 확인 버튼을 눌러 보세요.</p>
+            <div className="corr-formula-grid">
+              <label>
+                <span className="corr-field-label">기준 기호({sourceName})</span>
+                <select value={symbolA} onChange={(e) => setSymbolA(e.target.value)}>
+                  {SYMBOLS.map((s) => <option key={s} value={s}>{s}</option>)}
+                </select>
+              </label>
+              <label>
+                <span className="corr-field-label">대응 기호({targetName})</span>
+                <select value={symbolB} onChange={(e) => setSymbolB(e.target.value)}>
+                  {SYMBOLS.map((s) => <option key={s} value={s}>{s}</option>)}
+                </select>
+              </label>
+              <label>
+                <span className="corr-field-label">왼쪽 항</span>
+                <select value={lhsVar} onChange={(e) => setLhsVar(e.target.value)}>
+                  <option value="target">{targetName}</option>
+                  <option value="base">{sourceName}</option>
+                </select>
+              </label>
+              <label>
+                <span className="corr-field-label">오른쪽 기준항</span>
+                <select value={rhsVar} onChange={(e) => setRhsVar(e.target.value)}>
+                  <option value="base">{sourceName}</option>
+                  <option value="target">{targetName}</option>
+                </select>
+              </label>
+              <label>
+                <span className="corr-field-label">연산자</span>
+                <select value={operator} onChange={(e) => setOperator(e.target.value)}>
+                  {OPERATORS.map((op) => <option key={op} value={op}>{op}</option>)}
+                </select>
+              </label>
+              <label>
+                <span className="corr-field-label">수</span>
+                <input
+                  type="number"
+                  min="0"
+                  value={constant}
+                  onChange={(e) => setConstant(Number(e.target.value || 0))}
+                />
+              </label>
+            </div>
+            <p className="corr-formula-preview">
+              {lhsSymbol} = {rhsSymbol} {operator} {Number(constant)}
+            </p>
+            <p className="corr-formula-names">
+              ({lhsVar === "target" ? targetName : sourceName}) = ({rhsVar === "target" ? targetName : sourceName}) {operator} {Number(constant)}
+            </p>
+            <div className="corr-action-row">
+              <button type="button" className="btn primary" onClick={checkFinalFormula}>최종 정답 확인</button>
+            </div>
+            <p className={`corr-feedback ${finalSentence ? "is-good" : "is-warn"}`}>{finalFeedback}</p>
+          </section>
+
+          <section className="corr-panel corr-result">
+            <h2>4) 결과 출력</h2>
+            <p className="corr-tip">최종 정답을 맞히면 자연스러운 설명 문장이 나타납니다.</p>
+            <p className="corr-result-box">{finalSentence || "아직 결과가 없어요. 위 단계를 완료해 보세요."}</p>
+          </section>
+
+          {showCelebrate && (
+            <div className="corr-celebrate-backdrop" role="dialog" aria-modal="true" aria-label="축하 모달">
+              <div className="corr-celebrate-modal">
+                <div className="corr-sticker-row" aria-hidden="true">
+                  <span>🎉</span><span>⭐</span><span>👏</span><span>🍀</span><span>🎊</span>
+                </div>
+                <h3>완료! 정말 잘했어요</h3>
+                <p>대응 관계를 표와 식, 설명 문장까지 모두 완성했어요.</p>
+                <button type="button" className="btn primary" onClick={() => setShowCelebrate(false)}>확인</button>
+              </div>
+            </div>
+          )}
+        </div>
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById("correspondenceApp")).render(<App />);
+  </script>
+</body>
+</html>

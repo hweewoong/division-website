@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Edishorts Factory · 나눗셈 모듈</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Jua&family=Noto+Sans+KR:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body class="ef-site">
+  <div class="portal-topnav-wrap ef-nav">
+    <nav class="portal-topnav" aria-label="상단 탐색">
+      <a href="index.html" class="portal-logo-mini">Edishorts Factory</a>
+      <div class="portal-topnav-links">
+        <div class="portal-dropdown">
+          <button type="button" class="portal-dropbtn">학년</button>
+          <div class="portal-dropdown-menu">
+            <a href="index.html#explore">1학년</a><a href="index.html#explore">2학년</a><a href="index.html#explore">3학년</a>
+            <a href="index.html#explore">4학년</a><a href="index.html#explore">5학년</a><a href="index.html#explore">6학년</a>
+          </div>
+        </div>
+        <div class="portal-dropdown">
+          <button type="button" class="portal-dropbtn">학기</button>
+          <div class="portal-dropdown-menu portal-dropdown-menu-wide">
+            <a href="index.html#explore">1학년 1학기</a><a href="index.html#explore">1학년 2학기</a>
+            <a href="index.html#explore">2학년 1학기</a><a href="index.html#explore">2학년 2학기</a>
+            <a href="index.html#explore">3학년 1학기</a><a href="index.html#explore">3학년 2학기</a>
+            <a href="index.html#explore">4학년 1학기</a><a href="index.html#explore">4학년 2학기</a>
+            <a href="index.html#explore">5학년 1학기</a><a href="correspondence.html">5학년 2학기</a>
+            <a href="index.html#explore">6학년 1학기</a><a href="index.html#explore">6학년 2학기</a>
+          </div>
+        </div>
+        <div class="portal-dropdown">
+          <button type="button" class="portal-dropbtn">단원</button>
+          <div class="portal-dropdown-menu">
+            <span class="portal-dropdown-empty">단원 메뉴는 곧 제공됩니다.</span>
+          </div>
+        </div>
+      </div>
+      <div class="portal-topnav-pages">
+        <a href="notices.html">공지</a>
+        <a href="about.html">소개</a>
+        <a href="license.html">라이선스</a>
+      </div>
+    </nav>
+  </div>
+
+  <div class="page" id="pageRoot">
+    <header class="header">
+      <h1>자릿수와 함께하는 나눗셈</h1>
+      <p class="lead">백 → 십 → 일 순서로 몫을 적고, 깜빡이는 자리를 보며 차근차근 풀어 보세요.</p>
+    </header>
+
+    <section class="card concept" aria-labelledby="concept-title">
+      <h2 id="concept-title">자릿수란?</h2>
+      <p>숫자 한 자리마다 자리(위치)가 있어요. 오른쪽부터 <strong>일 → 십 → 백</strong> 순이에요. 색깔로 구분해 두었어요.</p>
+      <div class="place-demo" id="placeDemo" aria-live="polite"></div>
+    </section>
+
+    <section class="card input-section" aria-labelledby="calc-title">
+      <h2 id="calc-title">문제 만들기</h2>
+      <div class="difficulty-row" role="group" aria-label="난이도">
+        <button type="button" class="chip chip-diff active" data-diff="easy">쉬움</button>
+        <button type="button" class="chip chip-diff" data-diff="normal">보통</button>
+        <button type="button" class="chip chip-diff" data-diff="hard">어려움</button>
+      </div>
+      <p class="hint diff-desc" id="diffDesc">나누어지는 수 2자리 ÷ 나누는 수 1자리 · 나누어떨어지는 문제가 많아요.</p>
+      <form class="form" id="divForm" novalidate>
+        <p class="problem-preview" id="problemPreview" aria-live="polite"></p>
+        <div class="form-actions">
+          <button type="button" class="btn ghost" id="btnGenerateProblem">문제 생성</button>
+          <button type="button" class="btn ghost" id="btnWorksheet">학습지 제작하기</button>
+          <button type="submit" class="btn primary" id="btnStartPractice">여기서 풀기</button>
+        </div>
+      </form>
+    </section>
+
+    <section class="card practice-card hidden" id="practiceCard" aria-labelledby="practice-title">
+      <h2 id="practice-title">직접 풀기</h2>
+      <p class="phase-label" id="phaseLabel" aria-live="polite"></p>
+      <div class="step-dots" id="stepDots" aria-hidden="true"></div>
+
+      <div class="practice-align" id="practiceAlign">
+        <div class="practice-q-col">
+          <div id="quotientMount"></div>
+          <div class="long-division-wrap practice-ld">
+            <div class="long-division" id="longDivision" role="img" aria-label="세로 나눗셈"></div>
+          </div>
+        </div>
+        <p class="remainder-tip" id="remainderTip" hidden>
+          나누어떨어지지 않으면 몫을 모두 적은 뒤 <strong>나머지</strong>를 적어요.
+        </p>
+      </div>
+
+      <div class="remainder-block hidden" id="remainderBlock">
+        <label class="remainder-label">
+          <span>나머지</span>
+          <input type="text" id="remainderInput" class="quotient-inp remainder-inp" inputmode="numeric" maxlength="2" autocomplete="off" aria-label="나머지" />
+        </label>
+      </div>
+
+      <div class="practice-actions">
+        <button type="button" class="btn ghost touch-lg" id="btnCheckAll">전체 정답 확인</button>
+        <button type="button" class="btn ghost touch-lg" id="btnNewFromPractice">다른 문제</button>
+      </div>
+      <div class="practice-feedback" id="practiceFeedback" role="status" aria-live="polite"></div>
+    </section>
+
+    <footer class="footer footer-tip">
+      <p>막히면 곱셈 힌트를 보고, 같은 색으로 깜빡이는 <strong>나누어지는 수</strong> 자리를 짝지어 생각해 보세요.</p>
+    </footer>
+  </div>
+
+  <div id="worksheetOverlay" class="worksheet-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="wsTitle" aria-hidden="true">
+    <div class="worksheet-toolbar no-print">
+      <button type="button" class="btn ghost" id="wsRefresh">새로고침 · 다른 문제</button>
+      <button type="button" class="btn primary" id="wsPrint">인쇄 / PDF 저장</button>
+      <button type="button" class="btn ghost" id="wsClose">닫기</button>
+    </div>
+    <div class="worksheet-sheet-outer no-print">
+      <p class="worksheet-hint">아래 미리보기는 A4 인쇄에 맞춰져 있어요. <strong>인쇄 / PDF 저장</strong>으로 출력하세요.</p>
+    </div>
+    <div class="worksheet-sheet" id="worksheetSheet"></div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js" crossorigin="anonymous"></script>
+  <script src="app.js"></script>
+</body>
+</html>
