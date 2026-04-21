@@ -129,9 +129,7 @@
       if (!clips.length) return;
 
       var idx = 0;
-      var playable = [];
-      var initialized = false;
-      var initPromise = null;
+      var playable = clips.slice();
 
       function tryPlay() {
         video.muted = true;
@@ -167,52 +165,6 @@
         loadIndex(idx);
       }
 
-      function probeClip(src) {
-        return new Promise(function (resolve) {
-          var probe = document.createElement("video");
-          var cleaned = false;
-          var timer = setTimeout(doneFalse, 2200);
-          function cleanup() {
-            if (cleaned) return;
-            cleaned = true;
-            clearTimeout(timer);
-            probe.removeAttribute("src");
-            probe.load();
-          }
-          function doneTrue() {
-            cleanup();
-            resolve(true);
-          }
-          function doneFalse() {
-            cleanup();
-            resolve(false);
-          }
-          probe.preload = "metadata";
-          probe.muted = true;
-          probe.addEventListener("loadedmetadata", doneTrue, { once: true });
-          probe.addEventListener("canplay", doneTrue, { once: true });
-          probe.addEventListener("error", doneFalse, { once: true });
-          probe.src = encodeURI(src);
-          probe.load();
-        });
-      }
-
-      async function initPlayableList() {
-        if (initialized) return playable;
-        if (initPromise) return initPromise;
-        initPromise = (async function () {
-          var accepted = [];
-          for (var i = 0; i < clips.length; i += 1) {
-            var ok = await probeClip(clips[i]);
-            if (ok) accepted.push(clips[i]);
-          }
-          playable = accepted;
-          initialized = true;
-          return playable;
-        })();
-        return initPromise;
-      }
-
       video.addEventListener("ended", onEnded);
       video.addEventListener("error", onError);
 
@@ -223,7 +175,6 @@
             if (e.isIntersecting) {
               if (!started) {
                 started = true;
-                await initPlayableList();
                 if (playable.length) loadIndex(0);
               } else {
                 tryPlay();
