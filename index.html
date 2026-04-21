@@ -70,8 +70,16 @@
 
   <section class="ef-showreel" id="lessonShowreel" aria-labelledby="showreel-heading">
     <div class="ef-showreel-videos" aria-hidden="true">
-      <!-- assets/videos 폴더의 파일명을 clips 배열에 추가하면 자동으로 순환 재생됩니다. -->
-      <video id="efShowreelVideo" class="ef-showreel-video" muted playsinline preload="none"></video>
+      <video
+        class="ef-showreel-video"
+        autoplay
+        muted
+        loop
+        playsinline
+        preload="metadata"
+      >
+        <source src="assets/videos/video section.mp4" type="video/mp4" />
+      </video>
     </div>
     <div class="ef-showreel-scrim" aria-hidden="true"></div>
     <div class="ef-showreel-copy">
@@ -119,75 +127,5 @@
     <p>Copyright © Edishorts Factory. All rights reserved.</p>
   </footer>
 
-  <script>
-    (function () {
-      var video = document.getElementById("efShowreelVideo");
-      var section = document.getElementById("lessonShowreel");
-      if (!video || !section) return;
-
-      var clips = ["assets/videos/video section.mp4"];
-      if (!clips.length) return;
-
-      var idx = 0;
-      var playable = clips.slice();
-
-      function tryPlay() {
-        video.muted = true;
-        var p = video.play();
-        if (p && typeof p.catch === "function") p.catch(function () {});
-      }
-
-      function loadIndex(i) {
-        if (!playable.length) return;
-        idx = ((i % playable.length) + playable.length) % playable.length;
-        video.src = encodeURI(playable[idx]);
-        video.load();
-        tryPlay();
-      }
-
-      function advanceToNext() {
-        if (!playable.length) return;
-        loadIndex(idx + 1);
-      }
-
-      function onEnded() {
-        advanceToNext();
-      }
-
-      function onError() {
-        if (playable.length) playable.splice(idx, 1);
-        if (!playable.length) {
-          video.removeEventListener("error", onError);
-          video.removeEventListener("ended", onEnded);
-          video.pause();
-          return;
-        }
-        loadIndex(idx);
-      }
-
-      video.addEventListener("ended", onEnded);
-      video.addEventListener("error", onError);
-
-      var started = false;
-      var io = new IntersectionObserver(
-        function (entries) {
-          entries.forEach(async function (e) {
-            if (e.isIntersecting) {
-              if (!started) {
-                started = true;
-                if (playable.length) loadIndex(0);
-              } else {
-                tryPlay();
-              }
-            } else {
-              video.pause();
-            }
-          });
-        },
-        { threshold: 0.12 }
-      );
-      io.observe(section);
-    })();
-  </script>
 </body>
 </html>
