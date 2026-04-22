@@ -64,32 +64,55 @@
 
     const PAIR_OPTIONS = [
       {
+        id: "starline",
+        sourceLabel: "선의 개수",
+        targetLabel: "별 개수",
+        image: "assets/starline-stars-lines.svg",
+        unitType: "starline",
+        relationType: "add",
+        fixedValue: 1,
+        sourceGlyph: "／",
+        targetGlyph: "★"
+      },
+      {
         id: "sunflower",
         sourceLabel: "해바라기",
         targetLabel: "해바라기 노란색 꽃잎",
         image: "assets/해바라기-해바라기 노란색 꽃잎.png",
-        unitType: "petal"
+        unitType: "petal",
+        relationType: "multiply",
+        sourceGlyph: "🌻",
+        targetGlyph: "🌼"
       },
       {
         id: "grape",
         sourceLabel: "포도",
         targetLabel: "포도알",
         image: "assets/포도-포도알.png",
-        unitType: "grape"
+        unitType: "grape",
+        relationType: "multiply",
+        sourceGlyph: "🍇",
+        targetGlyph: "🟣"
       },
       {
         id: "chair",
         sourceLabel: "의자",
         targetLabel: "의자 다리",
         image: "assets/의자-의자 다리.png",
-        unitType: "leg"
+        unitType: "leg",
+        relationType: "multiply",
+        sourceGlyph: "🪑",
+        targetGlyph: "┃"
       },
       {
         id: "crocodile",
         sourceLabel: "악어",
         targetLabel: "악어 이빨",
         image: "assets/악어-악어 이빨.png",
-        unitType: "tooth"
+        unitType: "tooth",
+        relationType: "multiply",
+        sourceGlyph: "🐊",
+        targetGlyph: "▲"
       }
     ];
 
@@ -109,6 +132,9 @@
       } else if (level === "hard") {
         min = 100;
         max = 999;
+      } else if (level === "veryHard") {
+        min = 1000;
+        max = 5999;
       }
       let next = prev;
       let guard = 0;
@@ -119,11 +145,19 @@
       return next;
     }
 
-    function createBaseNumbers() {
+    function getBaseRange(level) {
+      if (level === "normal") return { min: 7, max: 150 };
+      if (level === "hard") return { min: 100, max: 999 };
+      if (level === "veryHard") return { min: 1000, max: 5999 };
+      return { min: 1, max: 60 };
+    }
+
+    function createBaseNumbers(level) {
       const rest = [];
       const used = new Set([1, 2, 3]);
+      const range = getBaseRange(level);
       while (rest.length < 7) {
-        const candidate = 4 + Math.floor(Math.random() * 17);
+        const candidate = randomInt(Math.max(4, range.min), range.max);
         if (!used.has(candidate)) {
           used.add(candidate);
           rest.push(candidate);
@@ -136,8 +170,7 @@
     function App() {
       const [selectedPairId, setSelectedPairId] = useState("");
       const [ratio, setRatio] = useState(3);
-      const [createdCount, setCreatedCount] = useState(1);
-      const [baseNumbers, setBaseNumbers] = useState(createBaseNumbers);
+      const [baseNumbers, setBaseNumbers] = useState(() => createBaseNumbers("easy"));
       const [inputValues, setInputValues] = useState(Array(10).fill(""));
       const [tableChecked, setTableChecked] = useState(false);
       const [wrongIndexes, setWrongIndexes] = useState([]);
@@ -147,19 +180,21 @@
       const [symbolB, setSymbolB] = useState("▲");
       const [lhsVar, setLhsVar] = useState("target");
       const [rhsVar, setRhsVar] = useState("base");
-      const [operator, setOperator] = useState("×");
-      const [constant, setConstant] = useState(3);
+      const [operator, setOperator] = useState("+");
+      const [constant, setConstant] = useState(1);
       const [finalFeedback, setFinalFeedback] = useState("");
       const [finalSentence, setFinalSentence] = useState("");
       const [showCelebrate, setShowCelebrate] = useState(false);
 
       const selectedPair = PAIR_OPTIONS.find((it) => it.id === selectedPairId);
       const hasPair = !!selectedPair;
+      const isAddRelation = selectedPair?.relationType === "add";
 
-      const cards = useMemo(() => {
-        if (!hasPair) return [];
-        return Array.from({ length: createdCount }, (_, i) => i + 1);
-      }, [createdCount, hasPair]);
+      function getTargetValue(baseValue) {
+        if (!selectedPair) return 0;
+        if (selectedPair.relationType === "add") return baseValue + selectedPair.fixedValue;
+        return baseValue * ratio;
+      }
 
       const currentStep = useMemo(() => {
         if (finalSentence) return 4;
@@ -175,29 +210,67 @@
         setWrongIndexes([]);
         setTableFeedback("");
         setInputValues(Array(10).fill(""));
-        setBaseNumbers(createBaseNumbers());
+        setBaseNumbers(createBaseNumbers(difficulty));
         setShowCelebrate(false);
-        setCreatedCount(1);
         setSelectedPairId(id);
+        setOperator("+");
+        setConstant(1);
+        setLhsVar("target");
+        setRhsVar("base");
+        const nextPair = PAIR_OPTIONS.find((it) => it.id === id);
+        if (nextPair?.relationType === "add") {
+          setRatio(nextPair.fixedValue);
+        } else {
+          setRatio(pickRandomRatio(ratio, difficulty));
+        }
       }
 
       function handleGenerate() {
         if (!hasPair) return;
-        setCreatedCount((v) => Math.min(v + 1, 10));
+        const next = selectedPair?.relationType === "add"
+          ? selectedPair.fixedValue
+          : pickRandomRatio(ratio, difficulty);
+        setRatio(next);
+        setTableChecked(false);
+        setWrongIndexes([]);
+        setTableFeedback("새로운 수로 생성했어요. 표를 다시 작성해 보세요.");
+        setFinalSentence("");
+        setFinalFeedback("");
+        setInputValues(Array(10).fill(""));
+        setBaseNumbers(createBaseNumbers(difficulty));
       }
 
       function handleRegenerate() {
         if (!hasPair) return;
-        const next = pickRandomRatio(ratio, difficulty);
+        const next = selectedPair?.relationType === "add"
+          ? selectedPair.fixedValue
+          : pickRandomRatio(ratio, difficulty);
         setRatio(next);
-        setConstant(next);
         setTableChecked(false);
         setWrongIndexes([]);
         setTableFeedback("대응 규칙이 바뀌었어요. 표를 다시 확인해 보세요.");
         setFinalSentence("");
         setFinalFeedback("");
         setInputValues(Array(10).fill(""));
-        setBaseNumbers(createBaseNumbers());
+        setBaseNumbers(createBaseNumbers(difficulty));
+        setOperator("+");
+        setConstant(1);
+        setLhsVar("target");
+        setRhsVar("base");
+      }
+
+      function handleDifficultyChange(level) {
+        setDifficulty(level);
+        setBaseNumbers(createBaseNumbers(level));
+        setTableChecked(false);
+        setWrongIndexes([]);
+        setTableFeedback("숫자 범위를 바꿨어요. 표를 새로 채워 보세요.");
+        setFinalSentence("");
+        setFinalFeedback("");
+        setInputValues(Array(10).fill(""));
+        if (selectedPair?.relationType === "multiply") {
+          setRatio(pickRandomRatio(ratio, level));
+        }
       }
 
       function updateInput(idx, value) {
@@ -216,7 +289,7 @@
           return;
         }
         const incorrect = baseNumbers
-          .map((num, idx) => (Number(inputValues[idx]) === num * ratio ? -1 : idx))
+          .map((num, idx) => (Number(inputValues[idx]) === getTargetValue(num) ? -1 : idx))
           .filter((idx) => idx !== -1);
         const isCorrect = incorrect.length === 0;
         if (isCorrect) {
@@ -253,7 +326,7 @@
           return;
         }
         const formulaCorrect = [1, 2, 3, 4, 5].every((baseValue) => {
-          const targetValue = baseValue * ratio;
+          const targetValue = getTargetValue(baseValue);
           return evaluateFormula(baseValue, targetValue);
         });
         if (!formulaCorrect) {
@@ -264,8 +337,12 @@
         setFinalFeedback("최종 정답입니다.");
         setShowCelebrate(true);
         setFinalSentence(
-          `${selectedPair.sourceLabel} 1개에 ${selectedPair.targetLabel}이(가) ${ratio}개씩 대응됩니다. ` +
-          `${selectedPair.sourceLabel}의 수가 1 늘어날 때마다 ${selectedPair.targetLabel}은(는) ${ratio}개씩 늘어납니다.`
+          isAddRelation
+            ? `${selectedPair.targetLabel}는 ${selectedPair.sourceLabel}보다 ${selectedPair.fixedValue}개 더 많습니다. ` +
+              `${selectedPair.sourceLabel}에 ${selectedPair.fixedValue}을(를) 더하면 ${selectedPair.targetLabel}가 됩니다. ` +
+              `${selectedPair.targetLabel}에서 ${selectedPair.fixedValue}을(를) 빼면 ${selectedPair.sourceLabel}가 됩니다.`
+            : `${selectedPair.sourceLabel} 1개에 ${selectedPair.targetLabel}이(가) ${ratio}개씩 대응됩니다. ` +
+              `${selectedPair.sourceLabel}의 수가 1 늘어날 때마다 ${selectedPair.targetLabel}은(는) ${ratio}개씩 늘어납니다.`
         );
       }
 
@@ -273,6 +350,70 @@
       const rhsSymbol = rhsVar === "target" ? symbolB : symbolA;
       const sourceName = selectedPair ? selectedPair.sourceLabel : "기준 양";
       const targetName = selectedPair ? selectedPair.targetLabel : "대응 양";
+
+      function renderStarLineFigure(lineCount) {
+        const starCount = lineCount + 1;
+        const width = 190;
+        const height = 96;
+        const step = Math.max(34, Math.floor((width - 34) / Math.max(starCount - 1, 1)));
+        const points = Array.from({ length: starCount }, (_, idx) => ({
+          x: 18 + idx * step,
+          y: idx % 2 === 0 ? 66 : 26
+        }));
+
+        return (
+          <svg width={width} height={height} viewBox={`0 0 ${width} ${height}`} aria-label={`선 ${lineCount}개일 때 별 ${starCount}개`}>
+            {Array.from({ length: lineCount }, (_, idx) => (
+              <line
+                key={`line-${lineCount}-${idx}`}
+                x1={points[idx].x}
+                y1={points[idx].y}
+                x2={points[idx + 1].x}
+                y2={points[idx + 1].y}
+                stroke="#f59e0b"
+                strokeWidth="3.5"
+                strokeLinecap="round"
+              />
+            ))}
+            {points.map((p, idx) => (
+              <text key={`star-${lineCount}-${idx}`} x={p.x} y={p.y + 8} textAnchor="middle" fontSize="24" fill="#facc15" stroke="#f59e0b" strokeWidth="0.8">
+                ★
+              </text>
+            ))}
+          </svg>
+        );
+      }
+
+      function renderChoiceThumbnail(pair) {
+        if (pair.id === "starline") {
+          return (
+            <svg width="140" height="68" viewBox="0 0 140 68" aria-hidden="true">
+              <line x1="8" y1="48" x2="28" y2="24" stroke="#f59e0b" strokeWidth="2.6" strokeLinecap="round" />
+              <line x1="28" y1="24" x2="48" y2="48" stroke="#f59e0b" strokeWidth="2.6" strokeLinecap="round" />
+              <text x="8" y="54" fontSize="14" fill="#facc15" stroke="#f59e0b" strokeWidth="0.5">★</text>
+              <text x="28" y="20" fontSize="14" fill="#facc15" stroke="#f59e0b" strokeWidth="0.5">★</text>
+              <text x="48" y="54" fontSize="14" fill="#facc15" stroke="#f59e0b" strokeWidth="0.5">★</text>
+              <text x="62" y="40" fontSize="16" fill="#8b5cf6">→</text>
+              <line x1="82" y1="48" x2="98" y2="24" stroke="#f59e0b" strokeWidth="2.6" strokeLinecap="round" />
+              <line x1="98" y1="24" x2="114" y2="48" stroke="#f59e0b" strokeWidth="2.6" strokeLinecap="round" />
+              <line x1="114" y1="48" x2="130" y2="24" stroke="#f59e0b" strokeWidth="2.6" strokeLinecap="round" />
+              <text x="82" y="54" fontSize="14" fill="#facc15" stroke="#f59e0b" strokeWidth="0.5">★</text>
+              <text x="98" y="20" fontSize="14" fill="#facc15" stroke="#f59e0b" strokeWidth="0.5">★</text>
+              <text x="114" y="54" fontSize="14" fill="#facc15" stroke="#f59e0b" strokeWidth="0.5">★</text>
+              <text x="130" y="20" fontSize="14" fill="#facc15" stroke="#f59e0b" strokeWidth="0.5">★</text>
+            </svg>
+          );
+        }
+        return (
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "8px", fontSize: "20px", height: "68px" }} aria-hidden="true">
+            <span>{pair.sourceGlyph}</span>
+            <span style={{ color: "#8b5cf6", fontWeight: 800 }}>→</span>
+            <span>{pair.targetGlyph}</span>
+            <span>{pair.targetGlyph}</span>
+            <span>{pair.targetGlyph}</span>
+          </div>
+        );
+      }
 
       return (
         <div className="corr-app">
@@ -300,23 +441,30 @@
               <button
                 type="button"
                 className={`corr-difficulty-btn ${difficulty === "easy" ? "is-active" : ""}`}
-                onClick={() => setDifficulty("easy")}
+                onClick={() => handleDifficultyChange("easy")}
               >
                 쉬움(1~6)
               </button>
               <button
                 type="button"
                 className={`corr-difficulty-btn ${difficulty === "normal" ? "is-active" : ""}`}
-                onClick={() => setDifficulty("normal")}
+                onClick={() => handleDifficultyChange("normal")}
               >
                 보통(7~99)
               </button>
               <button
                 type="button"
                 className={`corr-difficulty-btn ${difficulty === "hard" ? "is-active" : ""}`}
-                onClick={() => setDifficulty("hard")}
+                onClick={() => handleDifficultyChange("hard")}
               >
                 어려움(100~999)
+              </button>
+              <button
+                type="button"
+                className={`corr-difficulty-btn ${difficulty === "veryHard" ? "is-active" : ""}`}
+                onClick={() => handleDifficultyChange("veryHard")}
+              >
+                매우 어려움(1000~5999)
               </button>
             </div>
             <div className="corr-select-grid">
@@ -327,7 +475,7 @@
                   className={`corr-choice corr-choice-pair ${selectedPairId === pair.id ? "is-active" : ""}`}
                   onClick={() => choosePair(pair.id)}
                 >
-                  <img src={pair.image} alt={`${pair.sourceLabel}와 ${pair.targetLabel}`} className="corr-choice-image" />
+                  <div className="corr-choice-image">{renderChoiceThumbnail(pair)}</div>
                   <span>{pair.sourceLabel} - {pair.targetLabel}</span>
                 </button>
               ))}
@@ -341,10 +489,30 @@
                 <p className="corr-placeholder">대응쌍을 선택하면 시각화가 시작됩니다.</p>
               ) : (
                 <>
-                  <p className="corr-rule">{selectedPair.sourceLabel} 1개 ↔ {selectedPair.targetLabel} {ratio}개</p>
+                  <p className="corr-rule">
+                    {selectedPair.targetLabel}와 {selectedPair.sourceLabel} 사이의 대응
+                  </p>
                   <div className="corr-card-wrap">
-                    {cards.map((n) => (
-                      <div className="corr-object-card" key={n}>
+                    {isAddRelation ? (
+                      <div className="corr-object-card" style={{ width: "100%" }}>
+                        <div
+                          className="corr-object-composite"
+                          style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "10px", flexWrap: "wrap", padding: "12px 10px" }}
+                        >
+                          {[1, 2, 3, 4].map((lineCount) => (
+                            <div key={`starline-${lineCount}`} style={{ display: "grid", justifyItems: "center", gap: "4px" }}>
+                              {renderStarLineFigure(lineCount)}
+                              <small style={{ fontWeight: 700, color: "#334155" }}>선 {lineCount}개 · 별 {lineCount + 1}개</small>
+                            </div>
+                          ))}
+                          <div style={{ fontSize: "2rem", fontWeight: 800, color: "#64748b", padding: "0 8px" }}>...</div>
+                        </div>
+                        <p className="corr-sub-caption">
+                          선 1개 - 별 2개, 선 2개 - 별 3개, 선 3개 - 별 4개, 선 4개 - 별 5개, ...
+                        </p>
+                      </div>
+                    ) : (
+                      <div className="corr-object-card">
                         <div className="corr-object-composite">
                           <img
                             src={selectedPair.image}
@@ -357,9 +525,9 @@
                             ))}
                           </div>
                         </div>
-                        <p className="corr-sub-caption">{selectedPair.targetLabel} {ratio}개</p>
+                        <p className="corr-sub-caption">{selectedPair.sourceLabel} 1개 - {selectedPair.targetLabel} {ratio}개</p>
                       </div>
-                    ))}
+                    )}
                   </div>
                 </>
               )}

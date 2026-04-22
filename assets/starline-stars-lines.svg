@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="360" viewBox="0 0 640 360" role="img" aria-label="별의 수와 선의 수 대응 관계">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#f8f7ff" />
+      <stop offset="100%" stop-color="#eef2ff" />
+    </linearGradient>
+    <filter id="soft" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#8b5cf6" flood-opacity="0.25" />
+    </filter>
+  </defs>
+  <rect width="640" height="360" rx="24" fill="url(#bg)" />
+  <g stroke="#f59e0b" stroke-width="6" stroke-linecap="round" fill="none">
+    <path d="M95 250 L165 170 L235 250" />
+    <path d="M315 250 L385 170 L455 250" />
+    <path d="M455 250 L525 170" />
+  </g>
+  <g fill="#facc15" stroke="#f59e0b" stroke-width="3" filter="url(#soft)">
+    <polygon points="95,226 101,241 117,241 104,251 109,266 95,257 81,266 86,251 73,241 89,241" />
+    <polygon points="165,146 171,161 187,161 174,171 179,186 165,177 151,186 156,171 143,161 159,161" />
+    <polygon points="235,226 241,241 257,241 244,251 249,266 235,257 221,266 226,251 213,241 229,241" />
+    <polygon points="315,226 321,241 337,241 324,251 329,266 315,257 301,266 306,251 293,241 309,241" />
+    <polygon points="385,146 391,161 407,161 394,171 399,186 385,177 371,186 376,171 363,161 379,161" />
+    <polygon points="455,226 461,241 477,241 464,251 469,266 455,257 441,266 446,251 433,241 449,241" />
+    <polygon points="525,146 531,161 547,161 534,171 539,186 525,177 511,186 516,171 503,161 519,161" />
+  </g>
+  <text x="40" y="68" font-size="36" font-family="Noto Sans KR, sans-serif" font-weight="800" fill="#1f2937">선의 개수와 별 개수의 대응</text>
+  <text x="42" y="320" font-size="24" font-family="Noto Sans KR, sans-serif" font-weight="700" fill="#4338ca">별 개수 = 선의 개수 + 1</text>
+</svg>
