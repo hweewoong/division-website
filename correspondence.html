@@ -145,32 +145,24 @@
       return next;
     }
 
-    function getBaseRange(level) {
-      if (level === "normal") return { min: 7, max: 150 };
-      if (level === "hard") return { min: 100, max: 999 };
-      if (level === "veryHard") return { min: 1000, max: 5999 };
-      return { min: 1, max: 60 };
-    }
-
-    function createBaseNumbers(level) {
+    function createBaseNumbers() {
       const rest = [];
-      const used = new Set([1, 2, 3]);
-      const range = getBaseRange(level);
-      while (rest.length < 7) {
-        const candidate = randomInt(Math.max(4, range.min), range.max);
+      const used = new Set([1, 2, 3, 4]);
+      while (rest.length < 6) {
+        const candidate = randomInt(5, 99);
         if (!used.has(candidate)) {
           used.add(candidate);
           rest.push(candidate);
         }
       }
       rest.sort((a, b) => a - b);
-      return [1, 2, 3, ...rest];
+      return [1, 2, 3, 4, ...rest];
     }
 
     function App() {
       const [selectedPairId, setSelectedPairId] = useState("");
       const [ratio, setRatio] = useState(3);
-      const [baseNumbers, setBaseNumbers] = useState(() => createBaseNumbers("easy"));
+      const [baseNumbers, setBaseNumbers] = useState(() => createBaseNumbers());
       const [inputValues, setInputValues] = useState(Array(10).fill(""));
       const [tableChecked, setTableChecked] = useState(false);
       const [wrongIndexes, setWrongIndexes] = useState([]);
@@ -210,7 +202,7 @@
         setWrongIndexes([]);
         setTableFeedback("");
         setInputValues(Array(10).fill(""));
-        setBaseNumbers(createBaseNumbers(difficulty));
+        setBaseNumbers(createBaseNumbers());
         setShowCelebrate(false);
         setSelectedPairId(id);
         setOperator("+");
@@ -237,7 +229,7 @@
         setFinalSentence("");
         setFinalFeedback("");
         setInputValues(Array(10).fill(""));
-        setBaseNumbers(createBaseNumbers(difficulty));
+        setBaseNumbers(createBaseNumbers());
       }
 
       function handleRegenerate() {
@@ -252,7 +244,7 @@
         setFinalSentence("");
         setFinalFeedback("");
         setInputValues(Array(10).fill(""));
-        setBaseNumbers(createBaseNumbers(difficulty));
+        setBaseNumbers(createBaseNumbers());
         setOperator("+");
         setConstant(1);
         setLhsVar("target");
@@ -261,7 +253,7 @@
 
       function handleDifficultyChange(level) {
         setDifficulty(level);
-        setBaseNumbers(createBaseNumbers(level));
+        setBaseNumbers(createBaseNumbers());
         setTableChecked(false);
         setWrongIndexes([]);
         setTableFeedback("숫자 범위를 바꿨어요. 표를 새로 채워 보세요.");
