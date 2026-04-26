@@ -181,6 +181,14 @@
       const selectedPair = PAIR_OPTIONS.find((it) => it.id === selectedPairId);
       const hasPair = !!selectedPair;
       const isAddRelation = selectedPair?.relationType === "add";
+      const tableModes = useMemo(
+        () =>
+          baseNumbers.map((_, idx) => {
+            if (idx < 3) return "targetInput";
+            return (idx - 3) % 2 === 0 ? "targetInput" : "sourceInput";
+          }),
+        [baseNumbers]
+      );
 
       function getTargetValue(baseValue) {
         if (!selectedPair) return 0;
@@ -281,7 +289,11 @@
           return;
         }
         const incorrect = baseNumbers
-          .map((num, idx) => (Number(inputValues[idx]) === getTargetValue(num) ? -1 : idx))
+          .map((num, idx) => {
+            const mode = tableModes[idx];
+            const expected = mode === "sourceInput" ? num : getTargetValue(num);
+            return Number(inputValues[idx]) === expected ? -1 : idx;
+          })
           .filter((idx) => idx !== -1);
         const isCorrect = incorrect.length === 0;
         if (isCorrect) {
@@ -528,25 +540,43 @@
 
           <section className="corr-panel">
             <h2>2) 대응 관계 표</h2>
-            <p className="corr-tip">아래 표를 채우고 정답 확인을 눌러 보세요.</p>
+            <p className="corr-tip">1~3칸은 아래를 채우고, 이후 칸은 위/아래 빈칸이 교차로 나타납니다.</p>
             <div className="corr-table-shell">
               <table className="corr-table">
                 <tbody>
                   <tr>
                     <th>{selectedPair ? selectedPair.sourceLabel : "첫 번째 양"}</th>
-                    {baseNumbers.map((num, idx) => <td key={`base-${idx}`}>{num}</td>)}
+                    {baseNumbers.map((num, idx) => (
+                      <td key={`base-${idx}`}>
+                        {tableModes[idx] === "sourceInput" ? (
+                          <input
+                            className={wrongIndexes.includes(idx) ? "is-wrong" : ""}
+                            inputMode="numeric"
+                            value={inputValues[idx]}
+                            onChange={(e) => updateInput(idx, e.target.value)}
+                            aria-label={`${idx + 1}번째 ${selectedPair ? selectedPair.sourceLabel : "첫 번째 양"} 입력`}
+                          />
+                        ) : (
+                          num
+                        )}
+                      </td>
+                    ))}
                   </tr>
                   <tr>
                     <th>{selectedPair ? selectedPair.targetLabel : "두 번째 양"}</th>
-                    {inputValues.map((value, idx) => (
+                    {baseNumbers.map((num, idx) => (
                       <td key={`input-${idx}`}>
-                        <input
-                          className={wrongIndexes.includes(idx) ? "is-wrong" : ""}
-                          inputMode="numeric"
-                          value={value}
-                          onChange={(e) => updateInput(idx, e.target.value)}
-                          aria-label={`${idx + 1}번째 대응값 입력`}
-                        />
+                        {tableModes[idx] === "targetInput" ? (
+                          <input
+                            className={wrongIndexes.includes(idx) ? "is-wrong" : ""}
+                            inputMode="numeric"
+                            value={inputValues[idx]}
+                            onChange={(e) => updateInput(idx, e.target.value)}
+                            aria-label={`${idx + 1}번째 ${selectedPair ? selectedPair.targetLabel : "두 번째 양"} 입력`}
+                          />
+                        ) : (
+                          getTargetValue(num)
+                        )}
                       </td>
                     ))}
                   </tr>
