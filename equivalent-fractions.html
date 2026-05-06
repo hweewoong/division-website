@@ -473,15 +473,21 @@
       return { n: n / g, d: d / g };
     }
 
-    function randomFraction() {
+    function randomFraction(isFirstFraction = false) {
       const pool = DENOM_POOL_BY_LEVEL[currentLevel || "easy"];
       const d = pool[randomInt(0, pool.length - 1)];
-      const n = randomInt(1, d - 1);
+      let n;
+      if ((currentLevel || "easy") === "easy" && isFirstFraction) {
+        const candidates = [1, 2].filter((value) => value < d);
+        n = candidates[randomInt(0, candidates.length - 1)];
+      } else {
+        n = randomInt(1, d - 1);
+      }
       return { n, d };
     }
 
     function generateEquivalentPair() {
-      const base = randomFraction();
+      const base = randomFraction(true);
       const multipliers = [2, 3, 4, 5];
       const maxBound = currentLevel === "hard" ? 50 : 20;
       const valid = multipliers.filter((m) => base.n * m <= maxBound && base.d * m <= maxBound);
@@ -497,7 +503,7 @@
     function generateDifferentPair() {
       let guard = 0;
       while (guard < 200) {
-        const left = randomFraction();
+        const left = randomFraction(true);
         const right = randomFraction();
         const rl = reduceFraction(left.n, left.d);
         const rr = reduceFraction(right.n, right.d);
