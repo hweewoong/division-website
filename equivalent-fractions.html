@@ -525,7 +525,18 @@
     }
 
     function chooseQuestion() {
-      return Math.random() < 0.5 ? generateEquivalentPair() : generateDifferentPair();
+      let question = Math.random() < 0.5 ? generateEquivalentPair() : generateDifferentPair();
+      if (currentLevel === "easy") {
+        let guard = 0;
+        while (question.left.n > 2 && guard < 50) {
+          question = Math.random() < 0.5 ? generateEquivalentPair() : generateDifferentPair();
+          guard += 1;
+        }
+        if (question.left.n > 2) {
+          question.left.n = 1;
+        }
+      }
+      return question;
     }
 
     function gridForDenominator(d) {
