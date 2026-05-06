@@ -1,0 +1,736 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Edishorts Factory · 같은 크기의 분수 OX 게임</title>
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css" />
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    body.eqf-page {
+      font-family: "Pretendard", "Noto Sans KR", system-ui, sans-serif;
+      background: #f3f4f8;
+      color: #221f1f;
+    }
+    .eqf-main {
+      max-width: 1050px;
+      margin: 1.4rem auto 2.4rem;
+      padding: 0 1rem;
+    }
+    .eqf-header, .eqf-panel {
+      background: #fff;
+      border-radius: 18px;
+      border: 1px solid rgba(0, 0, 0, 0.08);
+      box-shadow: 0 10px 24px rgba(0, 0, 0, 0.08);
+    }
+    .eqf-header {
+      padding: 1.2rem 1.3rem;
+      margin-bottom: 0.9rem;
+    }
+    .eqf-chip {
+      display: inline-flex;
+      margin: 0 0 0.45rem;
+      padding: 0.25rem 0.7rem;
+      background: #efe8ff;
+      color: #5f43ad;
+      border-radius: 999px;
+      font-size: 0.82rem;
+      font-weight: 700;
+    }
+    .eqf-header h1 {
+      margin: 0;
+      font-size: clamp(1.3rem, 3vw, 2rem);
+      line-height: 1.22;
+      letter-spacing: -0.02em;
+    }
+    .eqf-header p {
+      margin: 0.5rem 0 0;
+      color: #5a5861;
+      font-size: 0.95rem;
+    }
+    .eqf-panel {
+      padding: 1rem;
+      position: relative;
+    }
+    .eqf-topbar {
+      display: flex;
+      gap: 0.6rem;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.8rem;
+    }
+    .eqf-stat {
+      display: flex;
+      gap: 0.45rem;
+      align-items: center;
+      flex-wrap: wrap;
+      font-size: 0.94rem;
+      font-weight: 700;
+      color: #3f3a4d;
+    }
+    .eqf-teacher-tools {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+    .eqf-teacher-btn {
+      border: 1px solid #d5daea;
+      background: #f6f8fc;
+      color: #3d4360;
+      border-radius: 999px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      padding: 0.35rem 0.78rem;
+      cursor: pointer;
+    }
+    .eqf-teacher-btn.is-paused {
+      background: #fff1f1;
+      border-color: #e3b5b5;
+      color: #9a3737;
+    }
+    .eqf-pill {
+      border-radius: 999px;
+      padding: 0.26rem 0.64rem;
+      background: #eef1f8;
+    }
+    .eqf-pill.timer {
+      background: #ffefe6;
+      color: #a44322;
+    }
+    .eqf-pill.level {
+      background: #e9f5ff;
+      color: #1a5585;
+    }
+    .eqf-level-modal {
+      position: absolute;
+      inset: 0;
+      z-index: 5;
+      background: rgba(19, 18, 24, 0.6);
+      border-radius: 18px;
+      display: grid;
+      place-items: center;
+      padding: 1rem;
+    }
+    .eqf-level-modal.hidden {
+      display: none;
+    }
+    .eqf-level-box {
+      width: min(540px, 100%);
+      border-radius: 16px;
+      background: #fff;
+      border: 1px solid #d7dbe6;
+      box-shadow: 0 14px 36px rgba(0, 0, 0, 0.24);
+      padding: 1rem;
+      text-align: center;
+    }
+    .eqf-level-box h3 {
+      margin: 0;
+      font-size: 1.1rem;
+      color: #312b40;
+    }
+    .eqf-level-box p {
+      margin: 0.4rem 0 0.8rem;
+      color: #625d71;
+      font-size: 0.92rem;
+    }
+    .eqf-level-row {
+      display: flex;
+      gap: 0.55rem;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    .eqf-level-btn {
+      border: 2px solid #cfdaef;
+      border-radius: 12px;
+      background: #f5f9ff;
+      color: #1f446b;
+      font-weight: 800;
+      font-size: 0.95rem;
+      padding: 0.58rem 0.95rem;
+      cursor: pointer;
+      min-width: 118px;
+    }
+    .eqf-level-btn:hover {
+      border-color: #5e88ff;
+      background: #edf2ff;
+    }
+    .eqf-title {
+      margin: 0.2rem 0 0.95rem;
+      text-align: center;
+      font-size: clamp(1.45rem, 4vw, 2.3rem);
+      font-weight: 900;
+      letter-spacing: -0.02em;
+      color: #3f2f2c;
+      text-shadow:
+        1px 1px 0 #fff,
+        2px 2px 0 #fff,
+        3px 3px 0 #2b1f1b;
+    }
+    .eqf-board {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 0.9rem;
+      align-items: start;
+    }
+    .eqf-card {
+      text-align: center;
+    }
+    .eqf-figure {
+      width: min(100%, 390px);
+      aspect-ratio: 1.2 / 1;
+      margin: 0 auto;
+      border: 2px solid #2e2b30;
+      background: #ffffff;
+      display: grid;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    .eqf-cell {
+      border-right: 1px dashed #2f2b31;
+      border-bottom: 1px dashed #2f2b31;
+      background: #ffffff;
+    }
+    .eqf-cell.is-fill {
+      background: rgba(129, 126, 178, 0.82);
+    }
+    .eqf-fraction {
+      display: inline-flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      margin-top: 0.5rem;
+      line-height: 1.05;
+      font-weight: 900;
+      min-width: 48px;
+      color: #16121f;
+    }
+    .eqf-fraction .num {
+      font-size: 2rem;
+      margin-bottom: 0.08rem;
+    }
+    .eqf-fraction .bar {
+      width: 100%;
+      height: 3px;
+      background: #17131d;
+      border-radius: 2px;
+    }
+    .eqf-fraction .den {
+      font-size: 2rem;
+      margin-top: 0.08rem;
+    }
+    .eqf-answer-row {
+      margin-top: 1rem;
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+    .eqf-ox {
+      width: 102px;
+      height: 102px;
+      border-radius: 999px;
+      border: 3px solid rgba(0, 0, 0, 0.15);
+      font-size: 2.4rem;
+      font-weight: 900;
+      color: #fff;
+      cursor: pointer;
+      transition: transform 0.12s ease, filter 0.15s ease;
+      box-shadow: inset 0 -7px 0 rgba(0, 0, 0, 0.18);
+    }
+    .eqf-ox:hover:not(:disabled) {
+      transform: translateY(-2px);
+      filter: brightness(1.04);
+    }
+    .eqf-ox:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    .eqf-ox.true {
+      background: radial-gradient(circle at 32% 28%, #64b2ff 0, #2f78d9 60%, #245cb0 100%);
+    }
+    .eqf-ox.false {
+      background: radial-gradient(circle at 32% 28%, #ff8f83 0, #ee5848 60%, #c63f32 100%);
+    }
+    .eqf-feedback {
+      margin-top: 0.95rem;
+      min-height: 1.45em;
+      text-align: center;
+      font-weight: 700;
+      color: #5b5668;
+    }
+    .eqf-feedback.good { color: #0c8f55; }
+    .eqf-feedback.bad { color: #b43f33; }
+    .eqf-actions {
+      margin-top: 0.8rem;
+      text-align: center;
+    }
+    .eqf-start {
+      border: 0;
+      border-radius: 999px;
+      background: #4b61df;
+      color: #fff;
+      font-size: 0.95rem;
+      font-weight: 700;
+      padding: 0.65rem 1.2rem;
+      cursor: pointer;
+    }
+    body.eqf-page.eqf-alert {
+      animation: eqf-red-flash 0.5s ease-in-out infinite alternate;
+    }
+    @keyframes eqf-red-flash {
+      from {
+        background: #f3f4f8;
+      }
+      to {
+        background: #ffd9d9;
+      }
+    }
+    @media (max-width: 760px) {
+      .eqf-board {
+        grid-template-columns: 1fr;
+      }
+      .eqf-ox {
+        width: 92px;
+        height: 92px;
+      }
+      .eqf-fraction .num,
+      .eqf-fraction .den {
+        font-size: 1.7rem;
+      }
+      .eqf-level-btn {
+        min-width: 100px;
+      }
+    }
+  </style>
+</head>
+<body class="ef-site eqf-page">
+  <div class="portal-topnav-wrap ef-nav">
+    <nav class="portal-topnav" aria-label="상단 탐색">
+      <a href="index.html" class="portal-logo-mini">Edishorts Factory</a>
+      <div class="portal-topnav-links">
+        <div class="portal-dropdown">
+          <button type="button" class="portal-dropbtn">학년</button>
+          <div class="portal-dropdown-menu">
+            <a href="index.html#explore">1학년</a><a href="index.html#explore">2학년</a><a href="index.html#explore">3학년</a>
+            <a href="index.html#explore">4학년</a><a href="index.html#explore">5학년</a><a href="index.html#explore">6학년</a>
+          </div>
+        </div>
+        <div class="portal-dropdown">
+          <button type="button" class="portal-dropbtn">학기</button>
+          <div class="portal-dropdown-menu portal-dropdown-menu-wide">
+            <a href="index.html#explore">1학년 1학기</a><a href="index.html#explore">1학년 2학기</a>
+            <a href="index.html#explore">2학년 1학기</a><a href="index.html#explore">2학년 2학기</a>
+            <a href="index.html#explore">3학년 1학기</a><a href="index.html#explore">3학년 2학기</a>
+            <a href="index.html#explore">4학년 1학기</a><a href="index.html#explore">4학년 2학기</a>
+            <a href="index.html#explore">5학년 1학기</a><a href="equivalent-fractions.html">5학년 2학기</a>
+            <a href="index.html#explore">6학년 1학기</a><a href="index.html#explore">6학년 2학기</a>
+          </div>
+        </div>
+        <div class="portal-dropdown">
+          <button type="button" class="portal-dropbtn">단원</button>
+          <div class="portal-dropdown-menu">
+            <span class="portal-dropdown-empty">같은 크기의 분수</span>
+          </div>
+        </div>
+      </div>
+      <div class="portal-topnav-pages">
+        <a href="notices.html">공지</a>
+        <a href="about.html">소개</a>
+        <a href="license.html">라이선스</a>
+      </div>
+    </nav>
+  </div>
+
+  <main class="eqf-main">
+    <header class="eqf-header">
+      <p class="eqf-chip">5학년 2학기 · 같은 크기의 분수</p>
+      <h1>같은 크기의 분수인가요? O/X 게임</h1>
+      <p>왼쪽과 오른쪽 분수의 수와 그림을 비교해 O/X를 선택하세요. easy/normal은 분모·분자 1~20, hard는 50 범위 문제로 구성됩니다.</p>
+    </header>
+
+    <section class="eqf-panel">
+      <div class="eqf-topbar">
+        <div class="eqf-stat">
+          <span class="eqf-pill" id="roundLabel">문제 1 / 10</span>
+          <span class="eqf-pill" id="scoreLabel">점수 0</span>
+          <span class="eqf-pill level" id="levelLabel">난이도 미선택</span>
+          <span class="eqf-pill timer" id="timerLabel">남은 시간 10초</span>
+        </div>
+        <div class="eqf-teacher-tools">
+          <button type="button" id="teacherPauseBtn" class="eqf-teacher-btn">교사용 타이머 멈춤</button>
+        </div>
+      </div>
+
+      <h2 class="eqf-title">둘은 크기가 같은 분수인가요?</h2>
+      <div class="eqf-board">
+        <article class="eqf-card">
+          <div id="leftFigure" class="eqf-figure" aria-label="왼쪽 분수 도형"></div>
+          <div class="eqf-fraction" aria-label="왼쪽 분수">
+            <span class="num" id="leftNum">1</span>
+            <span class="bar"></span>
+            <span class="den" id="leftDen">2</span>
+          </div>
+        </article>
+        <article class="eqf-card">
+          <div id="rightFigure" class="eqf-figure" aria-label="오른쪽 분수 도형"></div>
+          <div class="eqf-fraction" aria-label="오른쪽 분수">
+            <span class="num" id="rightNum">4</span>
+            <span class="bar"></span>
+            <span class="den" id="rightDen">8</span>
+          </div>
+        </article>
+      </div>
+
+      <div class="eqf-answer-row">
+        <button class="eqf-ox true" id="btnTrue" type="button" aria-label="같다">O</button>
+        <button class="eqf-ox false" id="btnFalse" type="button" aria-label="다르다">X</button>
+      </div>
+      <p id="feedback" class="eqf-feedback"></p>
+      <div class="eqf-actions">
+        <button type="button" id="restartBtn" class="eqf-start">다시 시작</button>
+      </div>
+
+      <div id="levelModal" class="eqf-level-modal">
+        <div class="eqf-level-box">
+          <h3>처음 난이도를 선택해 주세요</h3>
+          <p>easy(60초), normal(40초), hard(10초)</p>
+          <div class="eqf-level-row">
+            <button type="button" class="eqf-level-btn" data-level="easy">easy · 60초</button>
+            <button type="button" class="eqf-level-btn" data-level="normal">normal · 40초</button>
+            <button type="button" class="eqf-level-btn" data-level="hard">hard · 10초</button>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const TOTAL_ROUNDS = 10;
+    const LEVEL_CONFIG = {
+      easy: { label: "easy", timeLimit: 60 },
+      normal: { label: "normal", timeLimit: 40 },
+      hard: { label: "hard", timeLimit: 10 }
+    };
+    const DENOM_POOL_BY_LEVEL = {
+      easy: [2, 3, 4, 5, 6, 8, 9, 10, 12, 14, 15, 16, 18, 20],
+      normal: [2, 3, 4, 5, 6, 8, 9, 10, 12, 14, 15, 16, 18, 20],
+      hard: [2, 3, 4, 5, 6, 8, 9, 10, 12, 14, 15, 16, 18, 20, 21, 24, 25, 27, 28, 30, 32, 35, 36, 40, 42, 45, 48, 49, 50]
+    };
+
+    const leftFigure = document.getElementById("leftFigure");
+    const rightFigure = document.getElementById("rightFigure");
+    const leftNum = document.getElementById("leftNum");
+    const leftDen = document.getElementById("leftDen");
+    const rightNum = document.getElementById("rightNum");
+    const rightDen = document.getElementById("rightDen");
+    const roundLabel = document.getElementById("roundLabel");
+    const scoreLabel = document.getElementById("scoreLabel");
+    const levelLabel = document.getElementById("levelLabel");
+    const timerLabel = document.getElementById("timerLabel");
+    const feedback = document.getElementById("feedback");
+    const btnTrue = document.getElementById("btnTrue");
+    const btnFalse = document.getElementById("btnFalse");
+    const restartBtn = document.getElementById("restartBtn");
+    const teacherPauseBtn = document.getElementById("teacherPauseBtn");
+    const levelModal = document.getElementById("levelModal");
+    const levelButtons = document.querySelectorAll(".eqf-level-btn");
+
+    const correctAudio = new Audio(encodeURI("assets/와우.wav"));
+    const wrongAudio = new Audio(encodeURI("assets/뚱뚜둥뚜뚱 어이없는소리.mp3"));
+    const tickAudio = new Audio(encodeURI("assets/시계 타이머.mp3"));
+    tickAudio.loop = true;
+
+    let round = 1;
+    let score = 0;
+    let remain = 10;
+    let timerId = null;
+    let current = null;
+    let locked = false;
+    let currentLevel = null;
+    let timeLimit = 10;
+    let tickStarted = false;
+    let teacherPaused = false;
+
+    function randomInt(min, max) {
+      return min + Math.floor(Math.random() * (max - min + 1));
+    }
+
+    function gcd(a, b) {
+      let x = Math.abs(a);
+      let y = Math.abs(b);
+      while (y !== 0) {
+        const t = x % y;
+        x = y;
+        y = t;
+      }
+      return x || 1;
+    }
+
+    function reduceFraction(n, d) {
+      const g = gcd(n, d);
+      return { n: n / g, d: d / g };
+    }
+
+    function randomFraction() {
+      const pool = DENOM_POOL_BY_LEVEL[currentLevel || "easy"];
+      const d = pool[randomInt(0, pool.length - 1)];
+      const n = randomInt(1, d - 1);
+      return { n, d };
+    }
+
+    function generateEquivalentPair() {
+      const base = randomFraction();
+      const multipliers = [2, 3, 4, 5];
+      const maxBound = currentLevel === "hard" ? 50 : 20;
+      const valid = multipliers.filter((m) => base.n * m <= maxBound && base.d * m <= maxBound);
+      if (!valid.length) return generateEquivalentPair();
+      const k = valid[randomInt(0, valid.length - 1)];
+      return {
+        left: base,
+        right: { n: base.n * k, d: base.d * k },
+        isEquivalent: true
+      };
+    }
+
+    function generateDifferentPair() {
+      let guard = 0;
+      while (guard < 200) {
+        const left = randomFraction();
+        const right = randomFraction();
+        const rl = reduceFraction(left.n, left.d);
+        const rr = reduceFraction(right.n, right.d);
+        if (rl.n === rr.n && rl.d === rr.d) {
+          guard += 1;
+          continue;
+        }
+        const diff = Math.abs(left.n / left.d - right.n / right.d);
+        if (diff < 0.12) {
+          return {
+            left,
+            right,
+            isEquivalent: false
+          };
+        }
+        guard += 1;
+      }
+      return { left: { n: 2, d: 3 }, right: { n: 4, d: 7 }, isEquivalent: false };
+    }
+
+    function chooseQuestion() {
+      return Math.random() < 0.5 ? generateEquivalentPair() : generateDifferentPair();
+    }
+
+    function gridForDenominator(d) {
+      let bestRows = 1;
+      let bestCols = d;
+      let bestGap = d;
+      for (let r = 1; r <= Math.sqrt(d); r += 1) {
+        if (d % r !== 0) continue;
+        const c = d / r;
+        const gap = Math.abs(c - r);
+        if (gap < bestGap) {
+          bestRows = r;
+          bestCols = c;
+          bestGap = gap;
+        }
+      }
+      return { rows: bestRows, cols: bestCols };
+    }
+
+    function renderFigure(target, frac) {
+      const { rows, cols } = gridForDenominator(frac.d);
+      target.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
+      target.style.gridTemplateRows = `repeat(${rows}, 1fr)`;
+      target.innerHTML = "";
+      for (let i = 0; i < frac.d; i += 1) {
+        const cell = document.createElement("div");
+        cell.className = "eqf-cell" + (i < frac.n ? " is-fill" : "");
+        target.appendChild(cell);
+      }
+    }
+
+    function updateLabels() {
+      roundLabel.textContent = "문제 " + round + " / " + TOTAL_ROUNDS;
+      scoreLabel.textContent = "점수 " + score;
+      levelLabel.textContent = currentLevel ? ("난이도 " + LEVEL_CONFIG[currentLevel].label) : "난이도 미선택";
+      timerLabel.textContent = "남은 시간 " + remain + "초";
+    }
+
+    function setButtonsDisabled(disabled) {
+      btnTrue.disabled = disabled;
+      btnFalse.disabled = disabled;
+    }
+
+    function stopTimer() {
+      if (timerId) {
+        clearInterval(timerId);
+        timerId = null;
+      }
+      tickAudio.pause();
+      tickAudio.currentTime = 0;
+      tickStarted = false;
+      document.body.classList.remove("eqf-alert");
+    }
+
+    function runTimerInterval() {
+      stopTimer();
+      timerId = setInterval(() => {
+        remain -= 1;
+        if (remain <= 8 && !tickStarted) {
+          tickStarted = true;
+          document.body.classList.add("eqf-alert");
+          tickAudio.currentTime = 0;
+          tickAudio.play().catch(() => {});
+        }
+        updateLabels();
+        if (remain <= 0) {
+          handleTimeout();
+        }
+      }, 1000);
+    }
+
+    function startTimer() {
+      remain = timeLimit;
+      updateLabels();
+      teacherPaused = false;
+      teacherPauseBtn.textContent = "교사용 타이머 멈춤";
+      teacherPauseBtn.classList.remove("is-paused");
+      runTimerInterval();
+    }
+
+    function loadQuestion() {
+      if (!currentLevel) return;
+      locked = false;
+      setButtonsDisabled(false);
+      feedback.className = "eqf-feedback";
+      feedback.textContent = "O 또는 X를 선택해 보세요.";
+      current = chooseQuestion();
+      leftNum.textContent = current.left.n;
+      leftDen.textContent = current.left.d;
+      rightNum.textContent = current.right.n;
+      rightDen.textContent = current.right.d;
+      renderFigure(leftFigure, current.left);
+      renderFigure(rightFigure, current.right);
+      startTimer();
+    }
+
+    function nextRound() {
+      if (round >= TOTAL_ROUNDS) {
+        stopTimer();
+        locked = true;
+        setButtonsDisabled(true);
+        feedback.className = "eqf-feedback good";
+        feedback.textContent = "게임 완료! 최종 점수는 " + score + " / " + TOTAL_ROUNDS + "점입니다.";
+        return;
+      }
+      round += 1;
+      loadQuestion();
+    }
+
+    function handleAnswer(userSaysEquivalent) {
+      if (locked) return;
+      locked = true;
+      setButtonsDisabled(true);
+      stopTimer();
+      const correct = userSaysEquivalent === current.isEquivalent;
+      if (correct) {
+        score += 1;
+        correctAudio.currentTime = 0;
+        correctAudio.play().catch(() => {});
+        feedback.className = "eqf-feedback good";
+        feedback.textContent = "정답! 같은 크기 판단이 정확해요.";
+      } else {
+        wrongAudio.currentTime = 0;
+        wrongAudio.play().catch(() => {});
+        feedback.className = "eqf-feedback bad";
+        feedback.textContent = "오답! 정답은 " + (current.isEquivalent ? "O" : "X") + " 입니다.";
+      }
+      updateLabels();
+      setTimeout(nextRound, 900);
+    }
+
+    function handleTimeout() {
+      if (locked) return;
+      locked = true;
+      setButtonsDisabled(true);
+      stopTimer();
+      wrongAudio.currentTime = 0;
+      wrongAudio.play().catch(() => {});
+      feedback.className = "eqf-feedback bad";
+      feedback.textContent = "시간 종료! 정답은 " + (current.isEquivalent ? "O" : "X") + " 입니다.";
+      setTimeout(nextRound, 950);
+    }
+
+    function selectLevel(level) {
+      currentLevel = level;
+      timeLimit = LEVEL_CONFIG[level].timeLimit;
+      levelModal.classList.add("hidden");
+      resetGame();
+    }
+
+    function resetGame() {
+      if (!currentLevel) {
+        feedback.className = "eqf-feedback";
+        feedback.textContent = "먼저 난이도를 선택해 주세요.";
+        setButtonsDisabled(true);
+        stopTimer();
+        updateLabels();
+        return;
+      }
+      stopTimer();
+      round = 1;
+      score = 0;
+      remain = timeLimit;
+      updateLabels();
+      loadQuestion();
+    }
+
+    btnTrue.addEventListener("click", () => handleAnswer(true));
+    btnFalse.addEventListener("click", () => handleAnswer(false));
+    restartBtn.addEventListener("click", () => {
+      levelModal.classList.remove("hidden");
+      currentLevel = null;
+      setButtonsDisabled(true);
+      stopTimer();
+      teacherPaused = false;
+      teacherPauseBtn.textContent = "교사용 타이머 멈춤";
+      teacherPauseBtn.classList.remove("is-paused");
+      updateLabels();
+      feedback.className = "eqf-feedback";
+      feedback.textContent = "난이도를 다시 선택해 주세요.";
+    });
+    levelButtons.forEach((btn) => {
+      btn.addEventListener("click", () => selectLevel(btn.dataset.level));
+    });
+    teacherPauseBtn.addEventListener("click", () => {
+      if (!currentLevel || locked) return;
+      if (!teacherPaused) {
+        const input = window.prompt("교사용 코드 4자리를 입력하세요.");
+        if (input !== "0327") {
+          feedback.className = "eqf-feedback bad";
+          feedback.textContent = "코드가 맞지 않아 타이머를 멈출 수 없어요.";
+          return;
+        }
+        teacherPaused = true;
+        stopTimer();
+        teacherPauseBtn.textContent = "타이머 다시 시작";
+        teacherPauseBtn.classList.add("is-paused");
+        feedback.className = "eqf-feedback";
+        feedback.textContent = "교사용 모드: 타이머가 멈췄습니다.";
+        return;
+      }
+      teacherPaused = false;
+      teacherPauseBtn.textContent = "교사용 타이머 멈춤";
+      teacherPauseBtn.classList.remove("is-paused");
+      runTimerInterval();
+      feedback.className = "eqf-feedback";
+      feedback.textContent = "타이머를 다시 시작했습니다.";
+    });
+
+    setButtonsDisabled(true);
+    updateLabels();
+  </script>
+</body>
+</html>
