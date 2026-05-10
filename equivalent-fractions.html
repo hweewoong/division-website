@@ -347,7 +347,7 @@
     <header class="eqf-header">
       <p class="eqf-chip">5학년 2학기 · 같은 크기의 분수</p>
       <h1>같은 크기의 분수인가요? O/X 게임</h1>
-      <p>왼쪽과 오른쪽 분수의 수와 그림을 비교해 O/X를 선택하세요. easy/normal은 분모·분자 1~20, hard는 50 범위 문제로 구성됩니다.</p>
+      <p>왼쪽과 오른쪽 분수의 수와 그림을 비교해 O/X를 선택하세요. easy/normal은 1~20, hard는 첫 비교군 50 이하·두번째 비교군 999 이하로 구성됩니다.</p>
     </header>
 
     <section class="eqf-panel">
@@ -488,9 +488,12 @@
 
     function generateEquivalentPair() {
       const base = randomFraction(true);
-      const multipliers = [2, 3, 4, 5];
-      const maxBound = currentLevel === "hard" ? 50 : 20;
-      const valid = multipliers.filter((m) => base.n * m <= maxBound && base.d * m <= maxBound);
+      const rightBound = currentLevel === "hard" ? 999 : 20;
+      const maxMultiplier = Math.floor(Math.min(rightBound / base.n, rightBound / base.d));
+      const valid = [];
+      for (let m = 2; m <= maxMultiplier; m += 1) {
+        valid.push(m);
+      }
       if (!valid.length) return generateEquivalentPair();
       const k = valid[randomInt(0, valid.length - 1)];
       return {
@@ -500,11 +503,24 @@
       };
     }
 
+    function createComparableRightFraction(left, rightBound) {
+      const maxMultiplier = Math.floor(rightBound / left.d);
+      const multipliers = [];
+      for (let k = 1; k <= maxMultiplier; k += 1) {
+        multipliers.push(k);
+      }
+      const nonTrivial = multipliers.filter((k) => k > 1);
+      const picked = (nonTrivial.length ? nonTrivial : multipliers)[randomInt(0, (nonTrivial.length ? nonTrivial : multipliers).length - 1)];
+      const d = left.d * picked;
+      return { n: randomInt(1, d - 1), d };
+    }
+
     function generateDifferentPair() {
+      const rightBound = currentLevel === "hard" ? 999 : 20;
       let guard = 0;
       while (guard < 200) {
         const left = randomFraction(true);
-        const right = randomFraction();
+        const right = createComparableRightFraction(left, rightBound);
         const rl = reduceFraction(left.n, left.d);
         const rr = reduceFraction(right.n, right.d);
         if (rl.n === rr.n && rl.d === rr.d) {
@@ -521,7 +537,7 @@
         }
         guard += 1;
       }
-      return { left: { n: 2, d: 3 }, right: { n: 4, d: 7 }, isEquivalent: false };
+      return { left: { n: 2, d: 7 }, right: { n: 11, d: 42 }, isEquivalent: false };
     }
 
     function chooseQuestion() {

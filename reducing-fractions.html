@@ -1,0 +1,1325 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Edishorts Factory · 분수를 간단하게 나타내기(약분)</title>
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css" />
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    body.rf-page {
+      font-family: "Pretendard", "Noto Sans KR", system-ui, sans-serif;
+      background: #f4f6fb;
+      color: #1f1d24;
+    }
+    .rf-main {
+      max-width: 920px;
+      margin: 1.35rem auto 2.5rem;
+      padding: 0 1rem;
+    }
+    .rf-header,
+    .rf-card {
+      background: #fff;
+      border-radius: 18px;
+      border: 1px solid rgba(0, 0, 0, 0.08);
+      box-shadow: 0 8px 22px rgba(0, 0, 0, 0.06);
+    }
+    .rf-header {
+      padding: 1.15rem 1.25rem;
+      margin-bottom: 0.85rem;
+    }
+    .rf-chip {
+      display: inline-block;
+      margin: 0 0 0.4rem;
+      padding: 0.22rem 0.65rem;
+      background: #e8f4ff;
+      color: #1a5f8a;
+      border-radius: 999px;
+      font-size: 0.8rem;
+      font-weight: 700;
+    }
+    .rf-header h1 {
+      margin: 0;
+      font-size: clamp(1.25rem, 3vw, 1.85rem);
+      letter-spacing: -0.02em;
+    }
+    .rf-header p {
+      margin: 0.45rem 0 0;
+      color: #5a5668;
+      font-size: 0.94rem;
+    }
+    .rf-card {
+      padding: 1.1rem 1.15rem 1.2rem;
+      margin-bottom: 0.85rem;
+    }
+    .rf-card h2 {
+      margin: 0 0 0.55rem;
+      font-size: 1.05rem;
+      color: #254a7a;
+    }
+    .rf-card p.rf-tip {
+      margin: 0 0 0.75rem;
+      color: #5c5a66;
+      font-size: 0.9rem;
+    }
+    .rf-fraction-big {
+      display: inline-flex;
+      flex-direction: column;
+      align-items: center;
+      font-weight: 900;
+      font-size: clamp(2rem, 5vw, 2.75rem);
+      line-height: 1.05;
+      padding: 0.5rem 1rem;
+      border: 2px dashed #b8c4dc;
+      border-radius: 12px;
+      background: #fafcff;
+    }
+    .rf-fraction-big .bar {
+      width: 100%;
+      height: 4px;
+      background: #1a1a22;
+      border-radius: 2px;
+      margin: 0.12rem 0;
+    }
+    .rf-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.55rem;
+      align-items: center;
+      margin-top: 0.65rem;
+    }
+    .rf-btn {
+      border: 0;
+      border-radius: 999px;
+      padding: 0.55rem 1.1rem;
+      font-size: 0.92rem;
+      font-weight: 700;
+      cursor: pointer;
+      font-family: inherit;
+    }
+    .rf-btn-primary {
+      background: #3b6fd9;
+      color: #fff;
+    }
+    .rf-btn-secondary {
+      background: #eef1f8;
+      color: #2f3a55;
+      border: 1px solid #d5dbea;
+    }
+    .rf-btn:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+    }
+    .rf-method-grid {
+      display: grid;
+      gap: 0.55rem;
+    }
+    .rf-method {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.5rem;
+      padding: 0.65rem 0.75rem;
+      border: 2px solid #d8e0f0;
+      border-radius: 12px;
+      cursor: pointer;
+      background: #fbfcff;
+    }
+    .rf-method:hover {
+      border-color: #7a9fe8;
+    }
+    .rf-method input {
+      margin-top: 0.2rem;
+    }
+    .rf-method strong {
+      display: block;
+      color: #24324d;
+    }
+    .rf-method small {
+      color: #6b677d;
+    }
+    .rf-textarea {
+      width: 100%;
+      min-height: 4.5rem;
+      border: 1px solid #c9d2e8;
+      border-radius: 10px;
+      padding: 0.5rem 0.6rem;
+      font-family: inherit;
+      font-size: 0.95rem;
+      resize: vertical;
+    }
+    .rf-auto-box {
+      margin-top: 0.65rem;
+      padding: 0.65rem 0.75rem;
+      border-radius: 10px;
+      background: #f0f7ff;
+      border: 1px solid #c5daf5;
+      font-weight: 700;
+      color: #1f4a7a;
+    }
+    .rf-ladder {
+      margin-top: 0.75rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.65rem;
+    }
+    .rf-ladder-row {
+      display: grid;
+      grid-template-columns: 4.5rem 1fr 1fr;
+      gap: 0.45rem;
+      align-items: center;
+    }
+    .rf-ladder-row.rf-ladder-head {
+      font-weight: 700;
+      font-size: 0.82rem;
+      color: #4a4f63;
+    }
+    /* ㄴ배: 왼쪽 세로 + 오른쪽 위 숫자 네모 + 아래 가로선 + 몫 입력 */
+    .rf-short-div-step {
+      display: grid;
+      grid-template-columns: 4.5rem 1fr;
+      gap: 0 0.5rem;
+      align-items: stretch;
+    }
+    .rf-short-l-left {
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      align-items: center;
+      border-right: 3px solid #2f3545;
+      padding: 0 0.4rem 0.45rem 0;
+      min-width: 0;
+    }
+    .rf-short-l-spacer {
+      flex: 1;
+      min-height: 0.35rem;
+    }
+    .rf-short-div-step:not(.rf-short-div-step-first) .rf-short-l-spacer {
+      min-height: 0.15rem;
+    }
+    .rf-short-l-left .short-div {
+      width: 3.85rem;
+      max-width: 100%;
+    }
+    .rf-short-l-right {
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+      padding-left: 0.15rem;
+      min-width: 0;
+    }
+    .rf-short-num-pair {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.45rem;
+    }
+    .rf-ladder-numbox {
+      border: 2px solid #2f3545;
+      border-radius: 8px;
+      padding: 0.45rem 0.5rem;
+      text-align: center;
+      font-weight: 800;
+      font-size: 1.2rem;
+      background: #fff;
+      min-height: 2.6rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .rf-short-hline {
+      margin: 0;
+      border: 0;
+      border-top: 3px solid #2f3545;
+      width: 100%;
+    }
+    .rf-short-quot-pair {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.45rem;
+    }
+    .rf-inp {
+      border: 1px solid #c5cde0;
+      border-radius: 8px;
+      padding: 0.4rem 0.45rem;
+      font-size: 1rem;
+      text-align: center;
+      font-family: inherit;
+      width: 100%;
+    }
+    .rf-gcd-line {
+      margin-top: 0.5rem;
+      font-weight: 800;
+      color: #1a3d6b;
+    }
+    .rf-divisor-inputs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+      margin-top: 0.5rem;
+    }
+    .rf-divisor-inputs .rf-inp {
+      width: 3.2rem;
+    }
+    .rf-step3-cols {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
+      gap: 0.55rem;
+      margin-top: 0.65rem;
+    }
+    .rf-step3-col {
+      border: 1px solid #cfd6ea;
+      border-radius: 10px;
+      padding: 0.5rem;
+      text-align: center;
+      background: #fcfdff;
+    }
+    .rf-step3-col .rf-div-label {
+      font-weight: 800;
+      color: #2d4a8f;
+      margin-bottom: 0.5rem;
+    }
+    .rf-feedback {
+      margin-top: 0.65rem;
+      font-weight: 700;
+      min-height: 1.35em;
+    }
+    .rf-feedback.ok {
+      color: #0d8a52;
+    }
+    .rf-feedback.bad {
+      color: #b23a32;
+    }
+    .rf-hidden {
+      display: none !important;
+    }
+    .rf-rank-list {
+      list-style: none;
+      padding: 0;
+      margin: 0.5rem 0 0;
+    }
+    .rf-rank-list li {
+      display: flex;
+      justify-content: space-between;
+      padding: 0.4rem 0.55rem;
+      border-bottom: 1px solid #e8ebf4;
+      font-size: 0.92rem;
+    }
+    .rf-rank-list li:first-child {
+      font-weight: 800;
+      background: #fff9e6;
+    }
+    .rf-sticky-problem {
+      position: sticky;
+      top: 52px;
+      z-index: 40;
+      margin-bottom: 0.85rem;
+      padding: 0.75rem 1rem;
+      background: linear-gradient(180deg, #fff 0%, #f6f8ff 100%);
+      border: 1px solid rgba(0, 0, 0, 0.08);
+      border-radius: 14px;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.65rem 1rem;
+    }
+    .rf-sticky-problem .rf-sticky-label {
+      font-size: 0.88rem;
+      font-weight: 800;
+      color: #2a4a7a;
+    }
+    .rf-sticky-problem .rf-fraction-big {
+      font-size: clamp(1.35rem, 3.5vw, 1.85rem);
+      padding: 0.35rem 0.75rem;
+      margin: 0;
+    }
+    .rf-next-wrap {
+      flex-basis: 100%;
+      margin: 0.5rem 0 0;
+      padding-top: 0.65rem;
+      border-top: 1px dashed #c5cde8;
+    }
+    /* 3단계: 분수 형식(위·가로선·아래) + 읽기 문장 */
+    .rf-step3-frac-wrap {
+      max-width: 15rem;
+      margin: 0 auto;
+      padding: 0.5rem 0.45rem 0.65rem;
+      background: #fff;
+      border: 1px solid #b8c4dc;
+      border-radius: 10px;
+    }
+    .rf-step3-line {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 0.25rem 0.35rem;
+      font-size: 1.02rem;
+      font-weight: 800;
+      color: #1f2a3d;
+      padding: 0.15rem 0;
+    }
+    .rf-step3-line .rf-inp {
+      width: 3.6rem;
+      min-height: 2.35rem;
+      font-size: 1.05rem;
+      font-weight: 700;
+    }
+    .rf-step3-fracbar {
+      height: 0;
+      margin: 0.2rem 0;
+      border: 0;
+      border-top: 3px solid #1a1a22;
+      width: 100%;
+      border-radius: 1px;
+    }
+    .rf-step3-readout {
+      margin-top: 0.55rem;
+      padding: 0.4rem 0.45rem;
+      font-size: 0.88rem;
+      font-weight: 700;
+      color: #3d4a63;
+      background: #eef2fa;
+      border-radius: 8px;
+      border: 1px solid #d5deef;
+      line-height: 1.45;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.2rem 0.45rem;
+    }
+    .rf-step3-readout .rf-step3-read-ko {
+      color: #1a3d6b;
+      font-weight: 800;
+    }
+    .rf-step3-vis-frac {
+      display: inline-flex;
+      flex-direction: column;
+      align-items: center;
+      vertical-align: middle;
+      margin-left: 0.15rem;
+      font-weight: 900;
+      line-height: 1.05;
+      padding: 0.2rem 0.35rem;
+      background: #fff;
+      border: 1px solid #c5cde0;
+      border-radius: 6px;
+    }
+    .rf-step3-vis-frac .rf-vn {
+      font-size: 1.08rem;
+    }
+    .rf-step3-vis-frac .rf-vbar {
+      width: 100%;
+      min-width: 2rem;
+      height: 3px;
+      background: #1a1a22;
+      margin: 0.1rem 0;
+      border-radius: 1px;
+    }
+    .rf-step3-vis-frac .rf-vd {
+      font-size: 1.08rem;
+    }
+    /* 4단계: 슬래시 없이 세로 분수 — 그리드로 한눈에 배치 */
+    .rf-step4-choices {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 0.55rem 0.6rem;
+    }
+    @media (min-width: 640px) {
+      .rf-step4-choices {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+    }
+    @media (min-width: 960px) {
+      .rf-step4-choices {
+        grid-template-columns: repeat(auto-fill, minmax(10.5rem, 1fr));
+      }
+    }
+    .rf-step4-opt {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.4rem;
+      padding: 0.45rem 0.5rem;
+      margin-bottom: 0;
+    }
+    .rf-step4-opt input[type="radio"] {
+      margin-top: 0.28rem;
+      flex-shrink: 0;
+    }
+    .rf-step4-opt-inner {
+      display: flex;
+      flex-direction: column;
+      gap: 0.22rem;
+      flex: 1;
+      min-width: 0;
+    }
+    .rf-step4-opt-inner > strong.rf-step4-label {
+      font-size: 0.82rem;
+      color: #24324d;
+    }
+    .rf-step4-frac-xl {
+      display: inline-flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-weight: 900;
+      line-height: 1.05;
+      padding: 0.22rem 0.45rem 0.28rem;
+      background: #fff;
+      border: 2px solid #2f3545;
+      border-radius: 10px;
+      box-shadow: 0 1px 5px rgba(0, 0, 0, 0.06);
+      align-self: flex-start;
+    }
+    .rf-step4-frac-xl .rf-fnum {
+      font-size: clamp(1rem, 2.6vw, 1.32rem);
+      letter-spacing: -0.02em;
+    }
+    .rf-step4-frac-xl .rf-fbar {
+      width: 100%;
+      min-width: 2.1rem;
+      height: 3px;
+      background: #1a1a22;
+      margin: 0.08rem 0;
+      border-radius: 1px;
+    }
+    .rf-step4-frac-xl .rf-fden {
+      font-size: clamp(1rem, 2.6vw, 1.32rem);
+      letter-spacing: -0.02em;
+    }
+    .rf-step4-caption {
+      display: block;
+      font-size: 0.7rem;
+      font-weight: 600;
+      color: #5c6075;
+      line-height: 1.25;
+      margin-top: 0;
+    }
+  </style>
+</head>
+<body class="ef-site rf-page">
+  <div class="portal-topnav-wrap ef-nav">
+    <nav class="portal-topnav" aria-label="상단 탐색">
+      <a href="index.html" class="portal-logo-mini">Edishorts Factory</a>
+      <div class="portal-topnav-links">
+        <div class="portal-dropdown">
+          <button type="button" class="portal-dropbtn">학년</button>
+          <div class="portal-dropdown-menu">
+            <a href="index.html#explore">1학년</a><a href="index.html#explore">2학년</a><a href="index.html#explore">3학년</a>
+            <a href="index.html#explore">4학년</a><a href="index.html#explore">5학년</a><a href="index.html#explore">6학년</a>
+          </div>
+        </div>
+        <div class="portal-dropdown">
+          <button type="button" class="portal-dropbtn">학기</button>
+          <div class="portal-dropdown-menu portal-dropdown-menu-wide">
+            <a href="index.html#explore">1학년 1학기</a><a href="index.html#explore">1학년 2학기</a>
+            <a href="index.html#explore">2학년 1학기</a><a href="index.html#explore">2학년 2학기</a>
+            <a href="index.html#explore">3학년 1학기</a><a href="index.html#explore">3학년 2학기</a>
+            <a href="index.html#explore">4학년 1학기</a><a href="index.html#explore">4학년 2학기</a>
+            <a href="index.html#explore">5학년 1학기</a><a href="reducing-fractions.html">5학년 2학기</a>
+            <a href="index.html#explore">6학년 1학기</a><a href="index.html#explore">6학년 2학기</a>
+          </div>
+        </div>
+        <div class="portal-dropdown">
+          <button type="button" class="portal-dropbtn">단원</button>
+          <div class="portal-dropdown-menu">
+            <span class="portal-dropdown-empty">약분</span>
+          </div>
+        </div>
+      </div>
+      <div class="portal-topnav-pages">
+        <a href="notices.html">공지</a>
+        <a href="about.html">소개</a>
+        <a href="license.html">라이선스</a>
+      </div>
+    </nav>
+  </div>
+
+  <main class="rf-main">
+    <header class="rf-header">
+      <p class="rf-chip">5학년 2학기 · 분수</p>
+      <h1>분수를 간단하게 나타내기(약분)</h1>
+      <p>공약수를 구하고, 공약수로 나누어 약분한 뒤 기약분수를 고르는 순서로 활동해 보세요.</p>
+    </header>
+
+    <div class="rf-sticky-problem rf-hidden" id="stickyProblem" aria-live="polite">
+      <span class="rf-sticky-label">지금 약분할 분수 (진분수)</span>
+      <div class="rf-fraction-big" aria-label="원래 분수">
+        <span id="stickyFracNum">48</span>
+        <span class="bar"></span>
+        <span id="stickyFracDen">72</span>
+      </div>
+      <button type="button" class="rf-btn rf-btn-secondary" id="btnRegenerateSticky">문제 다시 뽑기</button>
+      <div class="rf-next-wrap rf-hidden" id="nextStepWrap">
+        <button type="button" class="rf-btn rf-btn-primary" id="btnProceedNext">다음 단계로 넘어가기</button>
+      </div>
+    </div>
+
+    <section class="rf-card" id="step0">
+      <h2>시작</h2>
+      <p class="rf-tip">분자와 분모는 10 이상 90 이하인 <strong>진분수</strong>(분자 &lt; 분모)이며, 약분이 가능한 분수로 준비됩니다.</p>
+      <div class="rf-fraction-big" aria-label="약분할 분수">
+        <span id="fracNum">48</span>
+        <span class="bar"></span>
+        <span id="fracDen">72</span>
+      </div>
+      <div class="rf-row">
+        <button type="button" class="rf-btn rf-btn-secondary" id="btnRegenerate">문제 다시 뽑기</button>
+        <button type="button" class="rf-btn rf-btn-primary" id="btnStart">시작하기</button>
+      </div>
+    </section>
+
+    <section class="rf-card rf-hidden" id="step1">
+      <h2>1단계: 분모와 분자의 공약수를 구하는 방법 정하기</h2>
+      <p class="rf-tip">세 가지 방법 중 하나를 골라 주세요. (2번은 아직 준비 중입니다.)</p>
+      <div class="rf-method-grid">
+        <label class="rf-method">
+          <input type="radio" name="method" value="list" checked />
+          <span><strong>① 나열해서 구하기</strong><small>분자·분모의 약수를 직접 나열합니다.</small></span>
+        </label>
+        <label class="rf-method">
+          <input type="radio" name="method" value="gcdProduct" disabled />
+          <span><strong>② 여러 수의 곱으로 최대공약수 구하기</strong><small>(준비 중)</small></span>
+        </label>
+        <label class="rf-method">
+          <input type="radio" name="method" value="short" />
+          <span><strong>③ ㄴ배로 최대공약수 구하기</strong><small>짧은 나눗셈 형태로 공약수를 찾습니다.</small></span>
+        </label>
+      </div>
+      <div class="rf-row">
+        <button type="button" class="rf-btn rf-btn-primary" id="btnStep1Next">다음 (2단계)</button>
+      </div>
+      <p class="rf-feedback" id="fb1"></p>
+    </section>
+
+    <section class="rf-card rf-hidden" id="step2list">
+      <h2>2단계: 정한 방법으로 공약수 구하기 (나열)</h2>
+      <p class="rf-tip"><span id="pairLabelList"></span>의 약수를 쉼표(,) 또는 띄어쓰기로 구분해 입력하세요. 공약수는 자동으로 표시됩니다.</p>
+      <label>
+        <strong>분자의 약수</strong>
+        <textarea class="rf-textarea" id="listNumDivisors" placeholder="예: 1, 2, 3, 4, 6, 8, 12, 16, 24, 32"></textarea>
+      </label>
+      <label style="display: block; margin-top: 0.65rem">
+        <strong>분모의 약수</strong>
+        <textarea class="rf-textarea" id="listDenDivisors" placeholder="예: 1, 2, 3, 4, 6, 8, 12, 16, 24, 48"></textarea>
+      </label>
+      <div class="rf-auto-box" id="listCommonOut">공약수: (입력 후 표시)</div>
+      <div class="rf-row">
+        <button type="button" class="rf-btn rf-btn-secondary" id="btnListPreview">공약수 다시 계산</button>
+        <button type="button" class="rf-btn rf-btn-primary" id="btnStep2ListSubmit">정답 제출</button>
+      </div>
+      <p class="rf-feedback" id="fb2list"></p>
+    </section>
+
+    <section class="rf-card rf-hidden" id="step2short">
+      <h2>2단계: 정한 방법으로 공약수 구하기 (ㄴ배)</h2>
+      <p class="rf-tip">왼쪽에 공약수를 넣고, 아래 칸에 나눈 몫을 입력하세요. 여러 번 나눌 수 있습니다. 식이 맞으면 최대공약수가 자동으로 채워집니다. <strong>행 추가</strong>를 잘못 눌렀을 때는 공약수 <strong>1</strong>을 넣고, 위와 같은 몫을 적어도 됩니다.</p>
+      <p><strong id="pairLabelShort"></strong></p>
+      <div class="rf-ladder" id="shortLadder"></div>
+      <div class="rf-row">
+        <button type="button" class="rf-btn rf-btn-secondary" id="btnShortAddRow">행 추가</button>
+        <button type="button" class="rf-btn rf-btn-secondary" id="btnShortCheck">최대공약수 확인</button>
+      </div>
+      <div class="rf-gcd-line" id="shortGcdLine">최대공약수: (아직 없음)</div>
+      <p class="rf-tip" style="margin-top: 0.75rem">최대공약수의 약수를 빈 칸에 직접 적어 보세요. (남는 칸은 비워도 됩니다.)</p>
+      <div class="rf-divisor-inputs" id="gcdDivisorInputs"></div>
+      <div class="rf-row">
+        <button type="button" class="rf-btn rf-btn-primary" id="btnStep2ShortSubmit">정답 제출</button>
+      </div>
+      <p class="rf-feedback" id="fb2short"></p>
+    </section>
+
+    <section class="rf-card rf-hidden" id="step3">
+      <h2>3단계: 공약수로 분모와 분자를 똑같이 나누기</h2>
+      <p class="rf-tip">위·아래는 <strong>분수처럼</strong> 배치했어요(가운데 줄이 분수의 가로선). 몫을 입력하면 아래에 <strong>「분모분의 분자」</strong>와 작은 분수 표시가 자동으로 나타납니다.</p>
+      <div class="rf-step3-cols" id="step3Cols"></div>
+      <div class="rf-row">
+        <button type="button" class="rf-btn rf-btn-primary" id="btnStep3Submit">정답 제출</button>
+      </div>
+      <p class="rf-feedback" id="fb3"></p>
+    </section>
+
+    <section class="rf-card rf-hidden" id="step4">
+      <h2>4단계: 약분한 분수 중 기약분수 고르기</h2>
+      <p class="rf-tip"><strong>기약분수</strong>란, 더 이상 약분할 수 없는 분수입니다. 즉 분자와 분모의 최대공약수가 1인 분수예요.</p>
+      <p class="rf-tip">3단계에서 나온 분수 중 기약분수 하나만 골라 주세요.</p>
+      <div id="step4Choices" class="rf-step4-choices"></div>
+      <div class="rf-row">
+        <button type="button" class="rf-btn rf-btn-primary" id="btnStep4Submit">정답 제출</button>
+      </div>
+      <p class="rf-feedback" id="fb4"></p>
+    </section>
+
+    <section class="rf-card rf-hidden" id="stepName">
+      <h2>이름 입력</h2>
+      <p class="rf-tip">모든 단계를 잘 마쳤어요. 랭킹에 올릴 이름을 적어 주세요.</p>
+      <input type="text" class="rf-inp" id="playerName" maxlength="12" placeholder="이름 (최대 12자)" style="max-width: 16rem" />
+      <div class="rf-row">
+        <button type="button" class="rf-btn rf-btn-primary" id="btnSaveRank">랭킹에 기록</button>
+      </div>
+      <p class="rf-feedback" id="fbName"></p>
+      <div class="rf-next-wrap rf-hidden" id="nextFromNameWrap">
+        <button type="button" class="rf-btn rf-btn-primary" id="btnProceedToRank">랭킹 보러 가기</button>
+      </div>
+    </section>
+
+    <section class="rf-card rf-hidden" id="stepEnd">
+      <h2>엔딩 · 랭킹</h2>
+      <p class="rf-tip">이름과 맞춘 활동 횟수(완료 횟수)로 랭킹을 쌓아요. 같은 기기 브라우저에 저장됩니다.</p>
+      <ol class="rf-rank-list" id="rankList"></ol>
+      <div class="rf-row">
+        <button type="button" class="rf-btn rf-btn-secondary" id="btnNewProblem">새 문제로 다시 하기</button>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const RANK_KEY = "rf-reducing-rank-v1";
+
+    const correctAudio = new Audio(encodeURI("assets/와우.wav"));
+    const wrongAudio = new Audio(encodeURI("assets/뚱뚜둥뚜뚱 어이없는소리.mp3"));
+    function playCorrectSound() {
+      correctAudio.currentTime = 0;
+      correctAudio.play().catch(() => {});
+    }
+    function playWrongSound() {
+      wrongAudio.currentTime = 0;
+      wrongAudio.play().catch(() => {});
+    }
+
+    let pendingRankEntry = null;
+    let proceedCallback = null;
+
+    let num = 24;
+    let den = 36;
+    let g = 12;
+    let method = "list";
+    let commonSorted = [];
+
+    function gcd(a, b) {
+      let x = Math.abs(a);
+      let y = Math.abs(b);
+      while (y !== 0) {
+        const t = x % y;
+        x = y;
+        y = t;
+      }
+      return x || 1;
+    }
+
+    function divisors(n) {
+      const out = [];
+      for (let i = 1; i * i <= n; i += 1) {
+        if (n % i === 0) {
+          out.push(i);
+          if (i * i !== n) out.push(n / i);
+        }
+      }
+      return out.sort((a, b) => a - b);
+    }
+
+    function randomInt(a, b) {
+      return a + Math.floor(Math.random() * (b - a + 1));
+    }
+
+    const PREFERRED_GCD_LIST = [4, 6, 8, 9, 10, 12, 14, 15, 16, 18, 20, 25, 27];
+    const PREFERRED_GCD_WEIGHT = 0.82;
+
+    function tryConstructFromGcd(g) {
+      if (!Number.isInteger(g) || g < 2) return null;
+      const bMax = Math.floor(90 / g);
+      const aMin = Math.ceil(10 / g);
+      const aMax = Math.min(Math.floor(89 / g), bMax - 1);
+      if (aMin > aMax || bMax < 2) return null;
+      for (let t = 0; t < 80; t += 1) {
+        const a = randomInt(aMin, aMax);
+        const b = randomInt(a + 1, bMax);
+        if (gcd(a, b) !== 1) continue;
+        const n = g * a;
+        const d = g * b;
+        if (n >= 10 && n < d && d <= 90 && gcd(n, d) === g) {
+          return { n, d, g };
+        }
+      }
+      return null;
+    }
+
+    function pickProblem() {
+      for (let guard = 0; guard < 450; guard += 1) {
+        const usePreferred = Math.random() < PREFERRED_GCD_WEIGHT;
+        const g = usePreferred
+          ? PREFERRED_GCD_LIST[randomInt(0, PREFERRED_GCD_LIST.length - 1)]
+          : randomInt(2, 48);
+        const res = tryConstructFromGcd(g);
+        if (res) return res;
+      }
+      return { n: 24, d: 36, g: 12 };
+    }
+
+    function parseList(str) {
+      return str
+        .split(/[\s,]+/)
+        .map((s) => s.trim())
+        .filter(Boolean)
+        .map((s) => Number(s))
+        .filter((x) => Number.isInteger(x) && x > 0);
+    }
+
+    function uniqueSorted(arr) {
+      return Array.from(new Set(arr)).sort((a, b) => a - b);
+    }
+
+    function setFracDisplay() {
+      const ns = String(num);
+      const ds = String(den);
+      document.getElementById("fracNum").textContent = ns;
+      document.getElementById("fracDen").textContent = ds;
+      const sn = document.getElementById("stickyFracNum");
+      const sd = document.getElementById("stickyFracDen");
+      if (sn) sn.textContent = ns;
+      if (sd) sd.textContent = ds;
+    }
+
+    function hideProceedNext() {
+      proceedCallback = null;
+      const wrap = document.getElementById("nextStepWrap");
+      if (wrap) wrap.classList.add("rf-hidden");
+    }
+
+    function showProceedNext(cb) {
+      proceedCallback = cb;
+      const wrap = document.getElementById("nextStepWrap");
+      if (wrap) wrap.classList.remove("rf-hidden");
+    }
+
+    function show(id, on) {
+      document.getElementById(id).classList.toggle("rf-hidden", !on);
+    }
+
+    function hideAllSteps() {
+      ["step0", "step1", "step2list", "step2short", "step3", "step4", "stepName", "stepEnd"].forEach((id) => show(id, false));
+    }
+
+    function updateListCommon() {
+      const rawA = parseList(document.getElementById("listNumDivisors").value);
+      const rawB = parseList(document.getElementById("listDenDivisors").value);
+      const validA = rawA.filter((x) => num % x === 0);
+      const validB = rawB.filter((x) => den % x === 0);
+      const inter = uniqueSorted(validA.filter((x) => validB.includes(x)));
+      document.getElementById("listCommonOut").textContent =
+        inter.length ? "공약수: " + inter.join(", ") : "공약수: (분자·분모 약수를 입력하면 여기에 표시돼요)";
+      return inter;
+    }
+
+    function createShortDivStep(isFirst) {
+      const step = document.createElement("div");
+      step.className = "rf-short-div-step" + (isFirst ? " rf-short-div-step-first" : "");
+      const numRow = isFirst
+        ? '<div class="rf-short-num-pair">' +
+          '<span class="rf-ladder-numbox"><span id="sN0">0</span></span>' +
+          '<span class="rf-ladder-numbox"><span id="sD0">0</span></span>' +
+          "</div>"
+        : "";
+      step.innerHTML =
+        '<div class="rf-short-l-left">' +
+        '<div class="rf-short-l-spacer"></div>' +
+        '<input class="rf-inp short-div" type="number" min="1" inputmode="numeric" placeholder="?" />' +
+        "</div>" +
+        '<div class="rf-short-l-right">' +
+        numRow +
+        '<hr class="rf-short-hline" />' +
+        '<div class="rf-short-quot-pair">' +
+        '<input class="rf-inp short-n" type="number" min="1" inputmode="numeric" placeholder="몫" />' +
+        '<input class="rf-inp short-d" type="number" min="1" inputmode="numeric" placeholder="몫" />' +
+        "</div>" +
+        "</div>";
+      return step;
+    }
+
+    function buildShortLadder() {
+      const wrap = document.getElementById("shortLadder");
+      wrap.innerHTML =
+        '<div class="rf-ladder-row rf-ladder-head"><span>공약수</span><span>분자</span><span>분모</span></div>';
+      wrap.appendChild(createShortDivStep(true));
+      document.getElementById("sN0").textContent = String(num);
+      document.getElementById("sD0").textContent = String(den);
+    }
+
+    function addShortRow() {
+      const wrap = document.getElementById("shortLadder");
+      wrap.appendChild(createShortDivStep(false));
+    }
+
+    function validateShortLadder() {
+      const steps = document.querySelectorAll("#shortLadder .rf-short-div-step");
+      let curN = num;
+      let curD = den;
+      let prod = 1;
+      for (let i = 0; i < steps.length; i += 1) {
+        const divIn = steps[i].querySelector(".short-div");
+        const nIn = steps[i].querySelector(".short-n");
+        const dIn = steps[i].querySelector(".short-d");
+        const dv = Number(divIn.value);
+        const nn = Number(nIn.value);
+        const dd = Number(dIn.value);
+        if (!Number.isInteger(dv) || dv < 1) return { ok: false, msg: "공약수(왼쪽)에 1 이상의 정수를 넣어 주세요." };
+        if (curN % dv !== 0 || curD % dv !== 0) return { ok: false, msg: "왼쪽 수가 위 줄의 분자·분모를 모두 나누어야 해요." };
+        if (curN / dv !== nn || curD / dv !== dd) return { ok: false, msg: "나눈 몫이 맞는지 다시 확인해 보세요." };
+        prod *= dv;
+        curN = nn;
+        curD = dd;
+      }
+      if (gcd(curN, curD) !== 1) {
+        return { ok: false, msg: "맨 아래 분자와 분모가 서로소가 될 때까지 행을 더 추가해 보세요." };
+      }
+      if (prod !== g) {
+        return { ok: false, msg: "지금까지 곱한 공약수의 곱이 최대공약수 " + g + "와 같아야 해요. (현재 곱: " + prod + ")" };
+      }
+      return { ok: true, prod };
+    }
+
+    function buildGcdDivisorInputs() {
+      const wrap = document.getElementById("gcdDivisorInputs");
+      wrap.innerHTML = "";
+      for (let i = 0; i < 8; i += 1) {
+        const inp = document.createElement("input");
+        inp.type = "number";
+        inp.min = "1";
+        inp.className = "rf-inp gcd-div-inp";
+        inp.dataset.idx = String(i);
+        wrap.appendChild(inp);
+      }
+    }
+
+    function readGcdDivisorInputs() {
+      const inps = document.querySelectorAll(".gcd-div-inp");
+      const vals = [];
+      inps.forEach((el) => {
+        const v = Number(el.value);
+        if (Number.isInteger(v) && v >= 1) vals.push(v);
+      });
+      return uniqueSorted(vals);
+    }
+
+    function buildStep3() {
+      const wrap = document.getElementById("step3Cols");
+      wrap.innerHTML = "";
+      commonSorted.forEach((c) => {
+        const col = document.createElement("div");
+        col.className = "rf-step3-col";
+        col.dataset.div = String(c);
+        col.innerHTML =
+          '<div class="rf-div-label">공약수 ' +
+          c +
+          "로 나누기</div>" +
+          '<div class="rf-step3-frac-wrap">' +
+          '<div class="rf-step3-line">' +
+          "<span>" +
+          num +
+          " ÷ " +
+          c +
+          ' =</span><input class="rf-inp step3n" type="number" min="1" inputmode="numeric" aria-label="분자를 ' +
+          c +
+          '로 나눈 몫" /></div>' +
+          '<hr class="rf-step3-fracbar" />' +
+          '<div class="rf-step3-line">' +
+          "<span>" +
+          den +
+          " ÷ " +
+          c +
+          ' =</span><input class="rf-inp step3d" type="number" min="1" inputmode="numeric" aria-label="분모를 ' +
+          c +
+          '로 나눈 몫" /></div>' +
+          "</div>" +
+          '<p class="rf-step3-readout" aria-live="polite">' +
+          "입력한 숫자: " +
+          '<span class="rf-step3-read-ko rf-step3-readout-ko">몫을 입력해 보세요.</span> ' +
+          '<span class="rf-step3-vis-frac rf-hidden rf-step3-vis-outer" aria-hidden="true">' +
+          '<span class="rf-vn rf-step3-vis-n"></span><span class="rf-vbar"></span><span class="rf-vd rf-step3-vis-d"></span>' +
+          "</span>" +
+          "</p>";
+
+        const nIn = col.querySelector(".step3n");
+        const dIn = col.querySelector(".step3d");
+        const koEl = col.querySelector(".rf-step3-readout-ko");
+        const visOuter = col.querySelector(".rf-step3-vis-outer");
+        const visN = col.querySelector(".rf-step3-vis-n");
+        const visD = col.querySelector(".rf-step3-vis-d");
+
+        function updateStep3Readout() {
+          const nn = Number(nIn.value);
+          const dd = Number(dIn.value);
+          if (Number.isInteger(nn) && Number.isInteger(dd) && nn > 0 && dd > 0) {
+            koEl.textContent = dd + "분의 " + nn;
+            visN.textContent = String(nn);
+            visD.textContent = String(dd);
+            visOuter.classList.remove("rf-hidden");
+            visOuter.setAttribute("aria-hidden", "false");
+          } else if ((nIn.value !== "" && nIn.value !== "-") || (dIn.value !== "" && dIn.value !== "-")) {
+            koEl.textContent = "분자·분모 몫을 모두 입력하면 표시돼요.";
+            visOuter.classList.add("rf-hidden");
+            visOuter.setAttribute("aria-hidden", "true");
+          } else {
+            koEl.textContent = "몫을 입력해 보세요.";
+            visOuter.classList.add("rf-hidden");
+            visOuter.setAttribute("aria-hidden", "true");
+          }
+        }
+        nIn.addEventListener("input", updateStep3Readout);
+        dIn.addEventListener("input", updateStep3Readout);
+
+        wrap.appendChild(col);
+      });
+    }
+
+    function buildStep4() {
+      const wrap = document.getElementById("step4Choices");
+      wrap.innerHTML = "";
+      commonSorted.forEach((c, idx) => {
+        const nn = num / c;
+        const dd = den / c;
+        const lab = document.createElement("label");
+        lab.className = "rf-method rf-step4-opt";
+        lab.innerHTML =
+          '<input type="radio" name="pickIr" value="' +
+          idx +
+          '" data-c="' +
+          c +
+          '" />' +
+          '<span class="rf-step4-opt-inner">' +
+          '<strong class="rf-step4-label">보기 ' +
+          (idx + 1) +
+          "</strong>" +
+          '<span class="rf-step4-frac-xl" aria-label="분수 ' +
+          dd +
+          "분의 " +
+          nn +
+          '">' +
+          '<span class="rf-fnum">' +
+          nn +
+          "</span>" +
+          '<span class="rf-fbar" aria-hidden="true"></span>' +
+          '<span class="rf-fden">' +
+          dd +
+          "</span></span>" +
+          '<small class="rf-step4-caption">공약수 ' +
+          c +
+          "로 나눈 결과</small>" +
+          "</span>";
+        wrap.appendChild(lab);
+      });
+    }
+
+    function loadRanking() {
+      try {
+        const raw = localStorage.getItem(RANK_KEY);
+        if (!raw) return [];
+        const arr = JSON.parse(raw);
+        return Array.isArray(arr) ? arr : [];
+      } catch {
+        return [];
+      }
+    }
+
+    function saveRanking(entry) {
+      const list = loadRanking();
+      const idx = list.findIndex((row) => row.name === entry.name);
+      if (idx >= 0) {
+        list[idx].score = (list[idx].score || 0) + 1;
+        list[idx].ts = entry.ts;
+      } else {
+        list.push(entry);
+      }
+      list.sort((a, b) => b.score - a.score || a.ts - b.ts);
+      localStorage.setItem(RANK_KEY, JSON.stringify(list.slice(0, 20)));
+    }
+
+    function renderRanking() {
+      const list = loadRanking();
+      const ol = document.getElementById("rankList");
+      ol.innerHTML = "";
+      if (!list.length) {
+        ol.innerHTML = "<li>아직 기록이 없어요.</li>";
+        return;
+      }
+      list.forEach((row, i) => {
+        const li = document.createElement("li");
+        li.innerHTML =
+          "<span>" +
+          (i + 1) +
+          "위 · " +
+          row.name +
+          "</span><span>맞춘 횟수 " +
+          row.score +
+          "</span>";
+        ol.appendChild(li);
+      });
+    }
+
+    function resetAll() {
+      hideProceedNext();
+      pendingRankEntry = null;
+      const nameNext = document.getElementById("nextFromNameWrap");
+      if (nameNext) nameNext.classList.add("rf-hidden");
+      show("stickyProblem", false);
+
+      const p = pickProblem();
+      num = p.n;
+      den = p.d;
+      g = p.g;
+      commonSorted = divisors(g);
+      setFracDisplay();
+      document.getElementById("pairLabelList").textContent = "분자 " + num + "와 분모 " + den;
+      document.getElementById("pairLabelShort").textContent = "분자 " + num + "와 분모 " + den;
+      document.getElementById("listNumDivisors").value = "";
+      document.getElementById("listDenDivisors").value = "";
+      document.getElementById("listCommonOut").textContent = "공약수: (입력 후 표시)";
+      document.getElementById("shortGcdLine").textContent = "최대공약수: (아직 없음)";
+      document.getElementById("fb1").textContent = "";
+      document.getElementById("fb1").className = "rf-feedback";
+      ["fb2list", "fb2short", "fb3", "fb4", "fbName"].forEach((id) => {
+        const el = document.getElementById(id);
+        el.textContent = "";
+        el.className = "rf-feedback";
+      });
+      hideAllSteps();
+      show("step0", true);
+    }
+
+    document.getElementById("btnRegenerate").addEventListener("click", () => {
+      resetAll();
+    });
+
+    document.getElementById("btnRegenerateSticky").addEventListener("click", () => {
+      resetAll();
+    });
+
+    document.getElementById("btnStart").addEventListener("click", () => {
+      hideProceedNext();
+      setFracDisplay();
+      show("stickyProblem", true);
+      hideAllSteps();
+      show("step1", true);
+    });
+
+    document.getElementById("btnProceedNext").addEventListener("click", () => {
+      const cb = proceedCallback;
+      hideProceedNext();
+      if (typeof cb === "function") cb();
+    });
+
+    document.getElementById("btnStep1Next").addEventListener("click", () => {
+      hideProceedNext();
+      const sel = document.querySelector('input[name="method"]:checked');
+      if (!sel || sel.value === "gcdProduct") {
+        document.getElementById("fb1").className = "rf-feedback bad";
+        document.getElementById("fb1").textContent = "사용할 방법을 선택해 주세요. (2번은 준비 중이에요.)";
+        playWrongSound();
+        return;
+      }
+      method = sel.value;
+      hideAllSteps();
+      if (method === "list") {
+        show("step2list", true);
+        updateListCommon();
+      } else {
+        show("step2short", true);
+        buildShortLadder();
+        buildGcdDivisorInputs();
+      }
+    });
+
+    document.getElementById("listNumDivisors").addEventListener("input", updateListCommon);
+    document.getElementById("listDenDivisors").addEventListener("input", updateListCommon);
+    document.getElementById("btnListPreview").addEventListener("click", updateListCommon);
+
+    document.getElementById("btnStep2ListSubmit").addEventListener("click", () => {
+      hideProceedNext();
+      const rawA = parseList(document.getElementById("listNumDivisors").value);
+      const rawB = parseList(document.getElementById("listDenDivisors").value);
+      const setA = uniqueSorted(rawA.filter((x) => num % x === 0));
+      const setB = uniqueSorted(rawB.filter((x) => den % x === 0));
+      const needA = divisors(num);
+      const needB = divisors(den);
+      const needCommon = divisors(g);
+      const okA = setA.length === needA.length && needA.every((x) => setA.includes(x));
+      const okB = setB.length === needB.length && needB.every((x) => setB.includes(x));
+      const inter = uniqueSorted(setA.filter((x) => setB.includes(x)));
+      const okCommon =
+        inter.length === needCommon.length && needCommon.every((x) => inter.includes(x));
+      const el = document.getElementById("fb2list");
+      if (!okA) {
+        el.className = "rf-feedback bad";
+        el.textContent = "분자 " + num + "의 약수를 1부터 빠짐없이 모두 나열했는지 확인해 보세요.";
+        updateListCommon();
+        playWrongSound();
+        return;
+      }
+      if (!okB) {
+        el.className = "rf-feedback bad";
+        el.textContent = "분모 " + den + "의 약수를 1부터 빠짐없이 모두 나열했는지 확인해 보세요.";
+        updateListCommon();
+        playWrongSound();
+        return;
+      }
+      if (!okCommon) {
+        el.className = "rf-feedback bad";
+        el.textContent = "공약수 집합이 맞는지 확인해 보세요. (정답 공약수: " + needCommon.join(", ") + ")";
+        updateListCommon();
+        playWrongSound();
+        return;
+      }
+      el.className = "rf-feedback ok";
+      el.textContent = "정답이에요! 위쪽 「다음 단계로 넘어가기」를 눌러 3단계로 이동하세요.";
+      playCorrectSound();
+      commonSorted = needCommon;
+      showProceedNext(() => {
+        hideAllSteps();
+        buildStep3();
+        show("step3", true);
+      });
+    });
+
+    document.getElementById("btnShortAddRow").addEventListener("click", addShortRow);
+
+    document.getElementById("btnShortCheck").addEventListener("click", () => {
+      const res = validateShortLadder();
+      const el = document.getElementById("fb2short");
+      if (!res.ok) {
+        el.className = "rf-feedback bad";
+        el.textContent = res.msg;
+        document.getElementById("shortGcdLine").textContent = "최대공약수: (아직 없음)";
+        playWrongSound();
+        return;
+      }
+      el.className = "rf-feedback ok";
+      el.textContent = "ㄴ배 식이 맞아요. 아래에 최대공약수의 약수를 적어 보세요.";
+      playCorrectSound();
+      document.getElementById("shortGcdLine").textContent = "최대공약수: " + g + " (= 왼쪽에 넣은 수들의 곱)";
+    });
+
+    document.getElementById("btnStep2ShortSubmit").addEventListener("click", () => {
+      hideProceedNext();
+      const chk = validateShortLadder();
+      const el = document.getElementById("fb2short");
+      if (!chk.ok) {
+        el.className = "rf-feedback bad";
+        el.textContent = chk.msg;
+        playWrongSound();
+        return;
+      }
+      const typed = readGcdDivisorInputs();
+      const need = divisors(g);
+      const ok = typed.length === need.length && need.every((x) => typed.includes(x));
+      if (!ok) {
+        el.className = "rf-feedback bad";
+        el.textContent = "최대공약수 " + g + "의 약수를 모두 빠짐없이 적었는지 확인해 보세요. (정답 약수: " + need.join(", ") + ")";
+        playWrongSound();
+        return;
+      }
+      el.className = "rf-feedback ok";
+      el.textContent = "정답이에요! 위쪽 「다음 단계로 넘어가기」를 눌러 3단계로 이동하세요.";
+      playCorrectSound();
+      commonSorted = need;
+      showProceedNext(() => {
+        hideAllSteps();
+        buildStep3();
+        show("step3", true);
+      });
+    });
+
+    document.getElementById("btnStep3Submit").addEventListener("click", () => {
+      hideProceedNext();
+      const cols = document.querySelectorAll("#step3Cols .rf-step3-col");
+      let ok = true;
+      cols.forEach((col) => {
+        const c = Number(col.dataset.div);
+        const nIn = Number(col.querySelector(".step3n").value);
+        const dIn = Number(col.querySelector(".step3d").value);
+        if (nIn !== num / c || dIn !== den / c) ok = false;
+      });
+      const el = document.getElementById("fb3");
+      if (!ok) {
+        el.className = "rf-feedback bad";
+        el.textContent = "나눈 몫이 맞는지 다시 확인해 보세요. 위에 보이는 원래 분수와 공약수를 다시 대조해 보세요.";
+        playWrongSound();
+        return;
+      }
+      el.className = "rf-feedback ok";
+      el.textContent = "정답이에요! 「다음 단계로 넘어가기」를 눌러 4단계로 이동하세요.";
+      playCorrectSound();
+      showProceedNext(() => {
+        hideAllSteps();
+        buildStep4();
+        show("step4", true);
+      });
+    });
+
+    document.getElementById("btnStep4Submit").addEventListener("click", () => {
+      hideProceedNext();
+      const sel = document.querySelector('input[name="pickIr"]:checked');
+      const el = document.getElementById("fb4");
+      if (!sel) {
+        el.className = "rf-feedback bad";
+        el.textContent = "기약분수에 해당하는 보기를 하나 골라 주세요.";
+        playWrongSound();
+        return;
+      }
+      const c = Number(sel.dataset.c);
+      if (c !== g) {
+        el.className = "rf-feedback bad";
+        el.textContent = "기약분수는 공약수 중 가장 큰 수(최대공약수)로 한 번에 약분한 분수예요. 다시 골라 보세요.";
+        playWrongSound();
+        return;
+      }
+      el.className = "rf-feedback ok";
+      el.textContent = "정답이에요! 「다음 단계로 넘어가기」를 눌러 이름을 입력하세요.";
+      playCorrectSound();
+      showProceedNext(() => {
+        hideAllSteps();
+        show("stepName", true);
+      });
+    });
+
+    document.getElementById("btnSaveRank").addEventListener("click", () => {
+      const name = document.getElementById("playerName").value.trim();
+      const el = document.getElementById("fbName");
+      const nameNext = document.getElementById("nextFromNameWrap");
+      if (nameNext) nameNext.classList.add("rf-hidden");
+      if (!name) {
+        el.className = "rf-feedback bad";
+        el.textContent = "이름을 입력해 주세요.";
+        return;
+      }
+      pendingRankEntry = { name, score: 1, ts: Date.now() };
+      el.className = "rf-feedback ok";
+      el.textContent = "기록할 준비가 되었어요. 아래 「랭킹 보러 가기」를 눌러 주세요.";
+      if (nameNext) nameNext.classList.remove("rf-hidden");
+    });
+
+    document.getElementById("btnProceedToRank").addEventListener("click", () => {
+      if (!pendingRankEntry) {
+        const el = document.getElementById("fbName");
+        el.className = "rf-feedback bad";
+        el.textContent = "먼저 이름을 입력하고 「랭킹에 기록」을 눌러 주세요.";
+        return;
+      }
+      saveRanking(pendingRankEntry);
+      pendingRankEntry = null;
+      const nameNext = document.getElementById("nextFromNameWrap");
+      if (nameNext) nameNext.classList.add("rf-hidden");
+      hideProceedNext();
+      show("stickyProblem", false);
+      hideAllSteps();
+      renderRanking();
+      show("stepEnd", true);
+    });
+
+    document.getElementById("btnNewProblem").addEventListener("click", () => {
+      resetAll();
+    });
+
+    resetAll();
+  </script>
+</body>
+</html>
