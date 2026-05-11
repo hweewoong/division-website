@@ -1,0 +1,728 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>약분 분수 두더지 게임 | Edishorts Factory</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;800;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    :root {
+      --bg: #0f1018;
+      --panel: #1a1e2e;
+      --panel-2: #262c44;
+      --text: #edf2ff;
+      --muted: #b7bfd7;
+      --good: #8fff9b;
+      --bad: #ff9a9a;
+      --pink: #ff4f95;
+      --cyan: #2dd1ff;
+      --orange: #ff9f51;
+      --lime: #6ae46a;
+      --violet: #8574ff;
+    }
+    * { box-sizing: border-box; }
+    body.mole-page {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "Noto Sans KR", system-ui, -apple-system, "Segoe UI", sans-serif;
+      background: radial-gradient(circle at top, #1a1f35 0%, var(--bg) 52%);
+      color: var(--text);
+    }
+    .mole-wrap {
+      width: min(1880px, 98vw);
+      min-height: calc(100vh - 3.5rem);
+      margin: 0.6rem auto 1rem;
+    }
+    .mole-hero {
+      background: linear-gradient(145deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.02));
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      border-radius: 20px;
+      padding: 1rem 1.15rem;
+      margin-bottom: 0.85rem;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+    }
+    .mole-title {
+      margin: 0 0 0.45rem;
+      font-size: clamp(1.45rem, 2.2vw, 2.2rem);
+      font-weight: 900;
+      letter-spacing: -0.03em;
+    }
+    .mole-top {
+      display: grid;
+      grid-template-columns: 1fr auto auto auto auto;
+      gap: 0.6rem;
+      align-items: center;
+    }
+    .mole-mission {
+      background: #fff;
+      color: #121621;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      min-height: 3.3rem;
+      font-weight: 900;
+      font-size: clamp(1.05rem, 1.7vw, 1.55rem);
+      padding: 0.2rem 0.5rem;
+      box-shadow: 0 3px 14px rgba(0, 0, 0, 0.2);
+    }
+    .mole-q {
+      font-size: clamp(1rem, 1.45vw, 1.3rem);
+    }
+    .mole-stat {
+      background: var(--panel-2);
+      border-radius: 10px;
+      padding: 0.7rem 0.85rem;
+      font-weight: 800;
+      font-size: clamp(0.95rem, 1.15vw, 1.25rem);
+      min-width: 5.5rem;
+      text-align: center;
+    }
+    .mole-btn {
+      border: 0;
+      border-radius: 10px;
+      padding: 0.72rem 1rem;
+      font-size: clamp(0.92rem, 1.1vw, 1.15rem);
+      font-weight: 900;
+      cursor: pointer;
+      color: #fff;
+      background: linear-gradient(120deg, #5078ff, #8c4dff);
+    }
+    .mole-btn.secondary {
+      background: #313a56;
+      color: #ebefff;
+    }
+    .mole-tip {
+      margin: 0.5rem 0 0;
+      font-size: clamp(0.85rem, 1vw, 1rem);
+      color: var(--muted);
+    }
+    .mole-feedback {
+      margin: 0.35rem 0 0;
+      min-height: 1.4rem;
+      font-weight: 800;
+      color: var(--muted);
+      font-size: clamp(0.95rem, 1.12vw, 1.15rem);
+    }
+    .mole-feedback.good { color: var(--good); }
+    .mole-feedback.bad { color: var(--bad); }
+
+    .setup-panel {
+      margin-top: 0.72rem;
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      border-radius: 14px;
+      padding: 0.7rem 0.8rem;
+      background: rgba(10, 11, 18, 0.36);
+      display: grid;
+      grid-template-columns: 1fr 1fr auto;
+      gap: 0.7rem;
+      align-items: end;
+    }
+    .setup-group strong {
+      display: block;
+      margin-bottom: 0.35rem;
+      font-size: 0.96rem;
+      color: #dce3ff;
+    }
+    .choice-row {
+      display: flex;
+      gap: 0.45rem;
+      flex-wrap: wrap;
+    }
+    .choice-row label {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.28rem;
+      font-weight: 700;
+      background: #2a3048;
+      border: 1px solid #3a4160;
+      border-radius: 999px;
+      padding: 0.4rem 0.65rem;
+      cursor: pointer;
+      font-size: 0.93rem;
+    }
+    .setup-note {
+      font-size: 0.84rem;
+      color: #9da6c5;
+      margin-top: 0.2rem;
+    }
+
+    .mole-grid {
+      display: grid;
+      gap: 0.85rem;
+      min-height: calc(100vh - 270px);
+    }
+    .mole-grid.players-4 {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+    .mole-grid.players-2 {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    .mole-lane {
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.02));
+      border: 2px solid var(--lane);
+      border-radius: 16px;
+      padding: 0.75rem 0.72rem;
+      box-shadow: 0 10px 28px rgba(0, 0, 0, 0.27);
+      display: flex;
+      flex-direction: column;
+      min-height: min(64vh, 690px);
+    }
+    .players-2 .mole-lane {
+      min-height: min(74vh, 820px);
+      padding: 1rem 1rem;
+    }
+    .mole-name {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      background: rgba(255, 255, 255, 0.93);
+      color: #151a29;
+      font-weight: 800;
+      border-radius: 10px;
+      padding: 0.24rem 0.6rem;
+      width: fit-content;
+      font-size: clamp(1rem, 1.15vw, 1.3rem);
+    }
+    .mole-score-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+      margin: 0.2rem 0 0.7rem;
+    }
+    .mole-score {
+      font-size: clamp(2.4rem, 4.8vw, 3.6rem);
+      font-weight: 900;
+      text-align: center;
+      line-height: 1;
+    }
+    .lane-mission-frac {
+      background: #fff;
+      border: 3px solid #1a1f2e;
+      border-radius: 14px;
+      padding: 0.4rem 0.65rem 0.45rem;
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.22);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 5.2rem;
+    }
+    .holes {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 0.58rem;
+      margin-bottom: 0.52rem;
+      flex: 1;
+      align-content: center;
+    }
+    .players-2 .holes {
+      gap: 0.9rem;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    .hole {
+      position: relative;
+      border: 3px solid rgba(255, 87, 156, 0.88);
+      border-radius: 999px;
+      background: radial-gradient(circle at 45% 30%, #393e55 0%, #1a1d2b 80%);
+      overflow: hidden;
+      min-height: clamp(72px, 9vh, 112px);
+    }
+    .players-2 .hole {
+      min-height: clamp(115px, 14vh, 165px);
+    }
+    .mole-pop {
+      position: absolute;
+      left: 50%;
+      bottom: -130%;
+      transform: translateX(-50%);
+      width: calc(100% - 0.6rem);
+      border: 0;
+      border-radius: 14px;
+      background: transparent;
+      padding: 0;
+      cursor: pointer;
+      transition: bottom 220ms ease-out;
+    }
+    .hole.active .mole-pop {
+      bottom: 0.12rem;
+    }
+    .mole-body {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.2rem;
+      background: linear-gradient(180deg, #fff8e3, #ffe4b2);
+      border: 2px solid #d8bd8f;
+      border-radius: 12px;
+      width: 100%;
+      padding: 0.25rem 0.1rem 0.22rem;
+      box-shadow: 0 6px 14px rgba(0, 0, 0, 0.24);
+    }
+    .mole-face {
+      font-size: clamp(1rem, 1.8vw, 1.45rem);
+      line-height: 1;
+    }
+    .players-2 .mole-face {
+      font-size: clamp(1.45rem, 2.9vw, 2rem);
+    }
+    .mole-fraction {
+      min-height: clamp(30px, 3.8vh, 48px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .players-2 .mole-fraction {
+      min-height: clamp(44px, 5.8vh, 64px);
+    }
+    .frac {
+      display: inline-flex;
+      flex-direction: column;
+      align-items: center;
+      line-height: 1.02;
+      font-weight: 900;
+    }
+    .frac .num, .frac .den {
+      display: block;
+      min-width: 1.7em;
+      text-align: center;
+    }
+    .frac .bar {
+      width: 100%;
+      min-width: 1.8em;
+      height: 3px;
+      background: currentColor;
+      margin: 0.06rem 0;
+      border-radius: 999px;
+    }
+    .frac.big {
+      font-size: clamp(1.1rem, 1.8vw, 1.6rem);
+      color: #111827;
+    }
+    .frac.medium {
+      font-size: clamp(0.95rem, 1.2vw, 1.25rem);
+      color: #0f1626;
+    }
+    .players-2 .frac.medium {
+      font-size: clamp(1.25rem, 1.95vw, 1.7rem);
+    }
+    .frac.small {
+      font-size: clamp(0.9rem, 1vw, 1.1rem);
+      color: inherit;
+    }
+    .frac.lane {
+      font-size: clamp(1.35rem, 2.4vw, 2.15rem);
+      color: #0f1626;
+    }
+    .players-2 .frac.lane {
+      font-size: clamp(1.65rem, 3.2vw, 2.6rem);
+    }
+
+    .lane-blue { --lane: var(--cyan); }
+    .lane-orange { --lane: var(--orange); }
+    .lane-pink { --lane: var(--pink); }
+    .lane-lime { --lane: var(--lime); }
+    .hidden { display: none !important; }
+
+    @media (max-width: 1280px) {
+      .mole-grid.players-4 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .setup-panel { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 760px) {
+      .mole-top { grid-template-columns: 1fr; }
+      .mole-grid.players-2,
+      .mole-grid.players-4 { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body class="ef-site mole-page">
+  <div class="portal-topnav-wrap ef-nav">
+    <nav class="portal-topnav" aria-label="상단 탐색">
+      <a href="index.html" class="portal-logo-mini">Edishorts Factory</a>
+      <div class="portal-topnav-pages">
+        <a href="index.html">홈</a>
+        <a href="equivalent-fractions.html">같은 크기 분수 O/X</a>
+        <a href="reducing-fractions.html">분수 약분 단계 학습</a>
+      </div>
+    </nav>
+  </div>
+
+  <main class="mole-wrap">
+    <section class="mole-hero">
+      <h1 class="mole-title">약분 분수 두더지 게임</h1>
+      <div class="mole-top">
+        <div class="mole-mission" id="missionText">
+          <span id="missionFrac"></span>
+          <span class="mole-q">을(를) 약분하면?</span>
+        </div>
+        <div class="mole-stat" id="timer">180초</div>
+        <div class="mole-stat" id="totalScore">총점 0</div>
+        <button type="button" class="mole-btn" id="startBtn">게임 시작</button>
+        <button type="button" class="mole-btn secondary" id="resetBtn">새 미션</button>
+      </div>
+      <div class="setup-panel" id="setupPanel">
+        <div class="setup-group">
+          <strong>난이도</strong>
+          <div class="choice-row">
+            <label><input type="radio" name="difficulty" value="easy" checked /> easy</label>
+            <label><input type="radio" name="difficulty" value="hard" /> hard</label>
+          </div>
+          <div class="setup-note">easy: 최대공약수 4, 6, 8, 9, 12 · 분자·분모 50 이하 / hard: 14, 16, 18, 20, 24, 27, 30, 36, 40, 48 · 분자·분모 99 이하</div>
+        </div>
+        <div class="setup-group">
+          <strong>인원 수</strong>
+          <div class="choice-row">
+            <label><input type="radio" name="players" value="2" checked /> 2인</label>
+            <label><input type="radio" name="players" value="4" /> 4인</label>
+          </div>
+          <div class="setup-note">2인은 더 큰 게임판(2열), 4인은 4열로 진행됩니다.</div>
+        </div>
+        <button type="button" class="mole-btn" id="applySetupBtn">설정 적용</button>
+      </div>
+      <p class="mole-tip">두더지를 누르면 점수가 올라갑니다. 정답 기약분수를 맞히면 +1, 오답은 -1입니다.</p>
+      <p class="mole-feedback" id="feedback">난이도/인원 수를 선택하고 「설정 적용」 후 게임을 시작하세요.</p>
+    </section>
+
+    <section class="mole-grid players-2" id="laneGrid"></section>
+  </main>
+
+  <script>
+    const correctAudio = new Audio(encodeURI("assets/와우.wav"));
+    const wrongAudio = new Audio(encodeURI("assets/뚱뚜둥뚜뚱 어이없는소리.mp3"));
+    const GCD_BY_LEVEL = {
+      easy: [4, 6, 8, 9, 12],
+      hard: [14, 16, 18, 20, 24, 27, 30, 36, 40, 48]
+    };
+    const GAME_SECONDS = 180;
+
+    const ANIMALS = [
+      { emoji: "🐻", name: "다람쥐", laneClass: "lane-blue", mole: "🐹" },
+      { emoji: "🐱", name: "기린", laneClass: "lane-orange", mole: "🐭" },
+      { emoji: "🐰", name: "범", laneClass: "lane-pink", mole: "🐰" },
+      { emoji: "🐹", name: "행박이", laneClass: "lane-lime", mole: "🐻" }
+    ];
+
+    const holes = [];
+    let activeTimers = [];
+    let popTimerId = null;
+    let clockTimerId = null;
+    let gameOn = false;
+    let remain = GAME_SECONDS;
+    let totalScore = 0;
+    let laneScores = [0, 0, 0, 0];
+    let mission = null;
+    let playerCount = 2;
+    let difficulty = "easy";
+
+    function randomInt(min, max) {
+      return min + Math.floor(Math.random() * (max - min + 1));
+    }
+    function gcd(a, b) {
+      let x = Math.abs(a);
+      let y = Math.abs(b);
+      while (y !== 0) {
+        const t = x % y;
+        x = y;
+        y = t;
+      }
+      return x || 1;
+    }
+    function simplify(n, d) {
+      const g = gcd(n, d);
+      return { n: n / g, d: d / g };
+    }
+    function playCorrect() {
+      correctAudio.currentTime = 0;
+      correctAudio.play().catch(() => {});
+    }
+    function playWrong() {
+      wrongAudio.currentTime = 0;
+      wrongAudio.play().catch(() => {});
+    }
+    function maxNumeratorDenominator() {
+      return difficulty === "easy" ? 50 : 99;
+    }
+
+    function fracMarkup(n, d, sizeClass) {
+      return (
+        '<span class="frac ' + sizeClass + '" aria-label="분수 ' + d + "분의 " + n + '">' +
+          '<span class="num">' + n + "</span>" +
+          '<span class="bar" aria-hidden="true"></span>' +
+          '<span class="den">' + d + "</span>" +
+        "</span>"
+      );
+    }
+
+    function pickMission() {
+      const preferred = GCD_BY_LEVEL[difficulty];
+      const MAX = maxNumeratorDenominator();
+      for (let guard = 0; guard < 800; guard += 1) {
+        const g = preferred[randomInt(0, preferred.length - 1)];
+        const bHi = Math.floor(MAX / g);
+        if (bHi < 2) continue;
+        const b = randomInt(2, bHi);
+        const aLo = Math.max(1, Math.ceil(10 / g));
+        const aHi = b - 1;
+        if (aLo > aHi) continue;
+        const a = randomInt(aLo, aHi);
+        if (gcd(a, b) !== 1) continue;
+        const n = g * a;
+        const d = g * b;
+        if (n >= 10 && n < d && n <= MAX && d <= MAX) {
+          return { n, d, ans: simplify(n, d), g };
+        }
+      }
+      return { n: 12, d: 20, ans: { n: 3, d: 5 }, g: 4 };
+    }
+
+    function fracOkForMole(c, ans) {
+      const cap = maxNumeratorDenominator();
+      if (!c || c.n <= 0 || c.d <= 0) return false;
+      if (c.n >= c.d) return false;
+      if (c.n > cap || c.d > cap) return false;
+      if (c.n === ans.n && c.d === ans.d) return false;
+      return true;
+    }
+
+    function makeWrongFraction(ans) {
+      const cap = maxNumeratorDenominator();
+      const cands = [];
+      cands.push({ n: ans.n + 1, d: ans.d });
+      cands.push({ n: Math.max(1, ans.n - 1), d: ans.d });
+      cands.push({ n: ans.n, d: ans.d + 1 });
+      if (ans.d > ans.n + 1) cands.push({ n: ans.n + 1, d: ans.d + 1 });
+      cands.push({ n: ans.n * 2, d: ans.d * 2 });
+      cands.push({ n: ans.n + 2, d: ans.d + 3 });
+      for (let i = cands.length - 1; i > 0; i -= 1) {
+        const j = randomInt(0, i);
+        const t = cands[i];
+        cands[i] = cands[j];
+        cands[j] = t;
+      }
+      for (let i = 0; i < cands.length; i += 1) {
+        if (fracOkForMole(cands[i], ans)) return cands[i];
+      }
+      let n = ans.n + 1;
+      let d = ans.d + 1;
+      if (n >= d) d = n + 1;
+      if (d > cap) {
+        d = cap;
+        n = Math.max(1, Math.min(ans.n, d - 2));
+      }
+      if (n > cap) n = cap - 1;
+      if (n === ans.n && d === ans.d) n = Math.max(1, n - 1);
+      return { n, d };
+    }
+
+    function setFeedback(msg, cls) {
+      const el = document.getElementById("feedback");
+      el.className = "mole-feedback " + (cls || "");
+      el.textContent = msg;
+    }
+
+    function updateMissionLabel() {
+      document.getElementById("missionFrac").innerHTML = fracMarkup(mission.n, mission.d, "big");
+      for (let i = 0; i < playerCount; i += 1) {
+        const box = document.getElementById("laneMissionFrac" + i);
+        if (box) box.innerHTML = fracMarkup(mission.n, mission.d, "lane");
+      }
+    }
+
+    function updateScores() {
+      document.getElementById("totalScore").textContent = "총점 " + totalScore;
+      for (let i = 0; i < playerCount; i += 1) {
+        const el = document.getElementById("laneScore" + i);
+        if (el) el.textContent = laneScores[i] + "점";
+      }
+    }
+
+    function clearTimers() {
+      if (popTimerId) clearInterval(popTimerId);
+      if (clockTimerId) clearInterval(clockTimerId);
+      popTimerId = null;
+      clockTimerId = null;
+      activeTimers.forEach((t) => clearTimeout(t));
+      activeTimers = [];
+    }
+
+    function hideHole(holeObj) {
+      holeObj.active = false;
+      holeObj.isCorrect = false;
+      holeObj.el.classList.remove("active");
+      holeObj.fracWrap.innerHTML = "";
+    }
+
+    function buildLanes() {
+      const wrap = document.getElementById("laneGrid");
+      wrap.className = "mole-grid players-" + playerCount;
+      wrap.innerHTML = "";
+      holes.length = 0;
+
+      const holesPerLane = playerCount === 2 ? 6 : 9;
+      for (let laneIdx = 0; laneIdx < playerCount; laneIdx += 1) {
+        const animal = ANIMALS[laneIdx];
+        const lane = document.createElement("section");
+        lane.className = "mole-lane " + animal.laneClass;
+
+        let html = "";
+        html += '<div class="mole-name"><span>' + animal.emoji + "</span><span>" + animal.name + "</span></div>";
+        html += '<div class="mole-score-row">' +
+          '<div class="mole-score" id="laneScore' + laneIdx + '">0점</div>' +
+          '<div class="lane-mission-frac" id="laneMissionFrac' + laneIdx + '"></div>' +
+          "</div>";
+        html += '<div class="holes">';
+        for (let i = 0; i < holesPerLane; i += 1) {
+          html += '<div class="hole" data-lane="' + laneIdx + '">' +
+                    '<button class="mole-pop" type="button" aria-label="두더지 선택">' +
+                      '<span class="mole-body">' +
+                        '<span class="mole-face">' + animal.mole + "</span>" +
+                        '<span class="mole-fraction"></span>' +
+                      "</span>" +
+                    "</button>" +
+                  "</div>";
+        }
+        html += "</div>";
+        lane.innerHTML = html;
+        wrap.appendChild(lane);
+      }
+
+      document.querySelectorAll(".hole").forEach((hole) => {
+        const btn = hole.querySelector(".mole-pop");
+        const fracWrap = hole.querySelector(".mole-fraction");
+        const obj = {
+          el: hole,
+          btn,
+          fracWrap,
+          active: false,
+          isCorrect: false,
+          lane: Number(hole.dataset.lane),
+          lock: false
+        };
+        holes.push(obj);
+        btn.addEventListener("click", () => {
+          if (!gameOn || !obj.active || obj.lock) return;
+          obj.lock = true;
+          obj.active = false;
+          obj.el.classList.remove("active");
+          if (obj.isCorrect) {
+            totalScore += 1;
+            laneScores[obj.lane] += 1;
+            setFeedback("정답! 기약분수는 맞게 찾았어요.", "good");
+            playCorrect();
+          } else {
+            totalScore = Math.max(0, totalScore - 1);
+            laneScores[obj.lane] = Math.max(0, laneScores[obj.lane] - 1);
+            setFeedback("오답! 약분 결과를 다시 생각해 보세요.", "bad");
+            playWrong();
+          }
+          obj.fracWrap.innerHTML = "";
+          updateScores();
+          setTimeout(() => {
+            obj.lock = false;
+          }, 120);
+        });
+      });
+    }
+
+    function spawnOne() {
+      if (!gameOn) return;
+      const available = holes.filter((h) => !h.active && !h.lock);
+      if (available.length === 0) return;
+      const target = available[randomInt(0, available.length - 1)];
+      const correctRate = difficulty === "easy" ? 0.4 : 0.3;
+      const isCorrect = Math.random() < correctRate;
+      let frac = isCorrect ? mission.ans : makeWrongFraction(mission.ans);
+      if (!isCorrect) {
+        let tries = 0;
+        while (tries < 25 && !fracOkForMole(frac, mission.ans)) {
+          frac = makeWrongFraction(mission.ans);
+          tries += 1;
+        }
+        if (!fracOkForMole(frac, mission.ans)) {
+          const cap = maxNumeratorDenominator();
+          frac = { n: Math.min(cap - 1, mission.ans.n + 1), d: Math.min(cap, mission.ans.d + 1) };
+          if (frac.n >= frac.d) frac = { n: 1, d: Math.min(cap, mission.ans.d + 1) };
+        }
+      }
+      target.isCorrect = isCorrect;
+      target.active = true;
+      target.fracWrap.innerHTML = fracMarkup(frac.n, frac.d, "medium");
+      target.el.classList.add("active");
+      const hideMs = difficulty === "easy" ? randomInt(1750, 2400) : randomInt(1350, 1950);
+      const t = setTimeout(() => hideHole(target), hideMs);
+      activeTimers.push(t);
+    }
+
+    function renewMission() {
+      mission = pickMission();
+      updateMissionLabel();
+      setFeedback("새 미션! 두더지에 적힌 분수 중 약분 결과를 찾으세요.", "");
+    }
+
+    function finishGame() {
+      gameOn = false;
+      clearTimers();
+      holes.forEach((h) => hideHole(h));
+      setFeedback("게임 종료! 총점 " + totalScore + "점", "good");
+    }
+
+    function startGame() {
+      clearTimers();
+      gameOn = true;
+      remain = GAME_SECONDS;
+      totalScore = 0;
+      laneScores = [0, 0, 0, 0];
+      updateScores();
+      renewMission();
+      document.getElementById("timer").textContent = remain + "초";
+      const spawnMs = difficulty === "easy" ? 620 : 500;
+      popTimerId = setInterval(spawnOne, spawnMs);
+      clockTimerId = setInterval(() => {
+        if (!gameOn) return;
+        remain -= 1;
+        if (remain % 12 === 0) renewMission();
+        document.getElementById("timer").textContent = remain + "초";
+        if (remain <= 0) finishGame();
+      }, 1000);
+    }
+
+    function applySetup() {
+      const diffEl = document.querySelector('input[name="difficulty"]:checked');
+      const playerEl = document.querySelector('input[name="players"]:checked');
+      difficulty = diffEl ? diffEl.value : "easy";
+      playerCount = playerEl ? Number(playerEl.value) : 2;
+      finishGame();
+      laneScores = [0, 0, 0, 0];
+      totalScore = 0;
+      buildLanes();
+      renewMission();
+      updateScores();
+      document.getElementById("timer").textContent = GAME_SECONDS + "초";
+      setFeedback("설정 적용 완료! 「게임 시작」을 누르세요.", "");
+    }
+
+    document.getElementById("applySetupBtn").addEventListener("click", applySetup);
+    document.getElementById("startBtn").addEventListener("click", startGame);
+    document.getElementById("resetBtn").addEventListener("click", () => {
+      finishGame();
+      renewMission();
+      totalScore = 0;
+      laneScores = [0, 0, 0, 0];
+      updateScores();
+      document.getElementById("timer").textContent = GAME_SECONDS + "초";
+      setFeedback("새 미션 준비 완료! 게임 시작을 누르세요.", "");
+    });
+
+    buildLanes();
+    mission = pickMission();
+    updateMissionLabel();
+    updateScores();
+    document.getElementById("timer").textContent = GAME_SECONDS + "초";
+  </script>
+</body>
+</html>
