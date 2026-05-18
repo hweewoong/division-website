@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Edishorts Factory · 분수의 크기 비교하기</title>
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css" />
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    body.cf-page {
+      font-family: "Pretendard", "Noto Sans KR", system-ui, sans-serif;
+      background: #f3f4f8;
+      color: #221f1f;
+    }
+    .cf-main {
+      max-width: 1050px;
+      margin: 1.4rem auto 2.4rem;
+      padding: 0 1rem;
+    }
+    .cf-header, .cf-panel {
+      background: #fff;
+      border-radius: 18px;
+      border: 1px solid rgba(0, 0, 0, 0.08);
+      box-shadow: 0 10px 24px rgba(0, 0, 0, 0.08);
+    }
+    .cf-header {
+      padding: 1.2rem 1.3rem;
+      margin-bottom: 0.9rem;
+    }
+    .cf-chip {
+      display: inline-flex;
+      margin: 0 0 0.45rem;
+      padding: 0.25rem 0.7rem;
+      background: #e8f4ef;
+      color: #2a6b52;
+      border-radius: 999px;
+      font-size: 0.82rem;
+      font-weight: 700;
+    }
+    .cf-header h1 {
+      margin: 0;
+      font-size: clamp(1.3rem, 3vw, 2rem);
+      line-height: 1.22;
+      letter-spacing: -0.02em;
+    }
+    .cf-header p {
+      margin: 0.5rem 0 0;
+      color: #5a5861;
+      font-size: 0.95rem;
+    }
+    .cf-panel {
+      padding: 1rem;
+      position: relative;
+    }
+    .cf-topbar {
+      display: flex;
+      gap: 0.6rem;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.8rem;
+    }
+    .cf-stat {
+      display: flex;
+      gap: 0.45rem;
+      align-items: center;
+      flex-wrap: wrap;
+      font-size: 0.94rem;
+      font-weight: 700;
+      color: #3f3a4d;
+    }
+    .cf-pill {
+      border-radius: 999px;
+      padding: 0.26rem 0.64rem;
+      background: #eef1f8;
+    }
+    .cf-title {
+      margin: 0.2rem 0 0.95rem;
+      text-align: center;
+      font-size: clamp(1.45rem, 4vw, 2.3rem);
+      font-weight: 900;
+      letter-spacing: -0.02em;
+      color: #3f2f2c;
+      text-shadow:
+        1px 1px 0 #fff,
+        2px 2px 0 #fff,
+        3px 3px 0 #2b1f1b;
+    }
+    .cf-board {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 0.9rem;
+      align-items: start;
+    }
+    .cf-card {
+      text-align: center;
+    }
+    .cf-figure {
+      width: min(100%, 390px);
+      aspect-ratio: 1.2 / 1;
+      margin: 0 auto;
+      border: 2px solid #2e2b30;
+      background: #ffffff;
+      display: grid;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    .cf-cell {
+      border-right: 1px dashed #2f2b31;
+      border-bottom: 1px dashed #2f2b31;
+      background: #ffffff;
+    }
+    .cf-cell.is-fill {
+      background: rgba(129, 126, 178, 0.82);
+    }
+    .cf-fraction {
+      display: inline-flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      margin-top: 0.5rem;
+      line-height: 1.05;
+      font-weight: 900;
+      min-width: 48px;
+      color: #16121f;
+    }
+    .cf-fraction .num {
+      font-size: 2rem;
+      margin-bottom: 0.08rem;
+    }
+    .cf-fraction .bar {
+      width: 100%;
+      height: 3px;
+      background: #17131d;
+      border-radius: 2px;
+    }
+    .cf-fraction .den {
+      font-size: 2rem;
+      margin-top: 0.08rem;
+    }
+    .cf-answer-row {
+      margin-top: 1rem;
+      display: flex;
+      justify-content: center;
+      gap: 0.85rem;
+      flex-wrap: wrap;
+    }
+    .cf-sign {
+      width: 102px;
+      height: 102px;
+      border-radius: 999px;
+      border: 3px solid rgba(0, 0, 0, 0.15);
+      font-size: 2.6rem;
+      font-weight: 900;
+      color: #fff;
+      cursor: pointer;
+      transition: transform 0.12s ease, filter 0.15s ease;
+      box-shadow: inset 0 -7px 0 rgba(0, 0, 0, 0.18);
+      line-height: 1;
+    }
+    .cf-sign:hover:not(:disabled) {
+      transform: translateY(-2px);
+      filter: brightness(1.04);
+    }
+    .cf-sign:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    .cf-sign.lt {
+      background: radial-gradient(circle at 32% 28%, #64b2ff 0, #2f78d9 60%, #245cb0 100%);
+    }
+    .cf-sign.eq {
+      background: radial-gradient(circle at 32% 28%, #9f8cff 0, #6f55d9 60%, #5340b0 100%);
+    }
+    .cf-sign.gt {
+      background: radial-gradient(circle at 32% 28%, #ff8f83 0, #ee5848 60%, #c63f32 100%);
+    }
+    .cf-feedback {
+      margin-top: 0.95rem;
+      min-height: 1.45em;
+      text-align: center;
+      font-weight: 700;
+      color: #5b5668;
+    }
+    .cf-feedback.good { color: #0c8f55; }
+    .cf-feedback.bad { color: #b43f33; }
+    .cf-actions {
+      margin-top: 0.8rem;
+      text-align: center;
+    }
+    .cf-start {
+      border: 0;
+      border-radius: 999px;
+      background: #4b61df;
+      color: #fff;
+      font-size: 0.95rem;
+      font-weight: 700;
+      padding: 0.65rem 1.2rem;
+      cursor: pointer;
+    }
+    @media (max-width: 760px) {
+      .cf-board {
+        grid-template-columns: 1fr;
+      }
+      .cf-sign {
+        width: 92px;
+        height: 92px;
+        font-size: 2.3rem;
+      }
+      .cf-fraction .num,
+      .cf-fraction .den {
+        font-size: 1.7rem;
+      }
+    }
+  </style>
+</head>
+<body class="ef-site cf-page">
+  <div class="portal-topnav-wrap ef-nav">
+    <nav class="portal-topnav" aria-label="상단 탐색">
+      <a href="index.html" class="portal-logo-mini">Edishorts Factory</a>
+      <div class="portal-topnav-links">
+        <div class="portal-dropdown">
+          <button type="button" class="portal-dropbtn">학년</button>
+          <div class="portal-dropdown-menu">
+            <a href="index.html#explore">1학년</a><a href="index.html#explore">2학년</a><a href="index.html#explore">3학년</a>
+            <a href="index.html#explore">4학년</a><a href="index.html#explore">5학년</a><a href="index.html#explore">6학년</a>
+          </div>
+        </div>
+        <div class="portal-dropdown">
+          <button type="button" class="portal-dropbtn">학기</button>
+          <div class="portal-dropdown-menu portal-dropdown-menu-wide">
+            <a href="index.html#explore">1학년 1학기</a><a href="index.html#explore">1학년 2학기</a>
+            <a href="index.html#explore">2학년 1학기</a><a href="index.html#explore">2학년 2학기</a>
+            <a href="index.html#explore">3학년 1학기</a><a href="index.html#explore">3학년 2학기</a>
+            <a href="index.html#explore">4학년 1학기</a><a href="index.html#explore">4학년 2학기</a>
+            <a href="compare-fractions.html">5학년 1학기</a><a href="equivalent-fractions.html">5학년 2학기</a>
+            <a href="index.html#explore">6학년 1학기</a><a href="index.html#explore">6학년 2학기</a>
+          </div>
+        </div>
+        <div class="portal-dropdown">
+          <button type="button" class="portal-dropbtn">단원</button>
+          <div class="portal-dropdown-menu">
+            <span class="portal-dropdown-empty">분수의 크기 비교</span>
+          </div>
+        </div>
+      </div>
+      <div class="portal-topnav-pages">
+        <a href="notices.html">공지</a>
+        <a href="about.html">소개</a>
+        <a href="license.html">라이선스</a>
+      </div>
+    </nav>
+  </div>
+
+  <main class="cf-main">
+    <header class="cf-header">
+      <p class="cf-chip">5학년 1학기 · 분수</p>
+      <h1>분수의 크기 비교하기</h1>
+      <p>왼쪽과 오른쪽 분수의 수와 그림을 비교해 &lt;, &gt;, = 중 하나를 선택하세요. 분모·분자는 2~50 범위이며, 두 분수의 분모는 서로 다르게 나옵니다.</p>
+    </header>
+
+    <section class="cf-panel">
+      <div class="cf-topbar">
+        <div class="cf-stat">
+          <span class="cf-pill" id="roundLabel">문제 1 / 10</span>
+          <span class="cf-pill" id="scoreLabel">점수 0</span>
+        </div>
+      </div>
+
+      <h2 class="cf-title">왼쪽 분수와 오른쪽 분수의 크기를 비교해 보세요</h2>
+      <div class="cf-board">
+        <article class="cf-card">
+          <div id="leftFigure" class="cf-figure" aria-label="왼쪽 분수 도형"></div>
+          <div class="cf-fraction" aria-label="왼쪽 분수">
+            <span class="num" id="leftNum">1</span>
+            <span class="bar"></span>
+            <span class="den" id="leftDen">2</span>
+          </div>
+        </article>
+        <article class="cf-card">
+          <div id="rightFigure" class="cf-figure" aria-label="오른쪽 분수 도형"></div>
+          <div class="cf-fraction" aria-label="오른쪽 분수">
+            <span class="num" id="rightNum">4</span>
+            <span class="bar"></span>
+            <span class="den" id="rightDen">8</span>
+          </div>
+        </article>
+      </div>
+
+      <div class="cf-answer-row">
+        <button class="cf-sign lt" id="btnLt" type="button" aria-label="왼쪽이 더 작다">&lt;</button>
+        <button class="cf-sign eq" id="btnEq" type="button" aria-label="크기가 같다">=</button>
+        <button class="cf-sign gt" id="btnGt" type="button" aria-label="왼쪽이 더 크다">&gt;</button>
+      </div>
+      <p id="feedback" class="cf-feedback"></p>
+      <div class="cf-actions">
+        <button type="button" id="restartBtn" class="cf-start">다시 시작</button>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const TOTAL_ROUNDS = 10;
+    const DENOM_POOL = [
+      ...Array.from({ length: 29 }, (_, i) => i + 2),
+      32, 35, 40, 42, 45, 48, 50
+    ];
+
+    const leftFigure = document.getElementById("leftFigure");
+    const rightFigure = document.getElementById("rightFigure");
+    const leftNum = document.getElementById("leftNum");
+    const leftDen = document.getElementById("leftDen");
+    const rightNum = document.getElementById("rightNum");
+    const rightDen = document.getElementById("rightDen");
+    const roundLabel = document.getElementById("roundLabel");
+    const scoreLabel = document.getElementById("scoreLabel");
+    const feedback = document.getElementById("feedback");
+    const btnLt = document.getElementById("btnLt");
+    const btnEq = document.getElementById("btnEq");
+    const btnGt = document.getElementById("btnGt");
+    const restartBtn = document.getElementById("restartBtn");
+    const answerButtons = [btnLt, btnEq, btnGt];
+
+    const correctAudio = new Audio(encodeURI("assets/와우.wav"));
+    const wrongAudio = new Audio(encodeURI("assets/뚱뚜둥뚜뚱 어이없는소리.mp3"));
+
+    let round = 1;
+    let score = 0;
+    let current = null;
+    let locked = false;
+
+    function randomInt(min, max) {
+      return min + Math.floor(Math.random() * (max - min + 1));
+    }
+
+    function gcd(a, b) {
+      let x = Math.abs(a);
+      let y = Math.abs(b);
+      while (y !== 0) {
+        const t = x % y;
+        x = y;
+        y = t;
+      }
+      return x || 1;
+    }
+
+    function reduceFraction(n, d) {
+      const g = gcd(n, d);
+      return { n: n / g, d: d / g };
+    }
+
+    function pickDenominator(excludeDen = null) {
+      const pool = excludeDen === null
+        ? DENOM_POOL
+        : DENOM_POOL.filter((d) => d !== excludeDen);
+      return pool[randomInt(0, pool.length - 1)];
+    }
+
+    function pickNumerator(d) {
+      const candidates = DENOM_POOL.filter((v) => v < d);
+      if (!candidates.length) {
+        return randomInt(1, d - 1);
+      }
+      return candidates[randomInt(0, candidates.length - 1)];
+    }
+
+    function randomFraction(excludeDen = null) {
+      const d = pickDenominator(excludeDen);
+      const n = pickNumerator(d);
+      return { n, d };
+    }
+
+    function generateEquivalentPair() {
+      for (let guard = 0; guard < 300; guard += 1) {
+        const left = randomFraction();
+        const d2Options = DENOM_POOL.filter((d) => {
+          if (d === left.d) return false;
+          if ((left.n * d) % left.d !== 0) return false;
+          const n2 = (left.n * d) / left.d;
+          return n2 >= 1 && n2 < d;
+        });
+        if (!d2Options.length) continue;
+        const d2 = d2Options[randomInt(0, d2Options.length - 1)];
+        const n2 = (left.n * d2) / left.d;
+        return { left, right: { n: n2, d: d2 } };
+      }
+      return { left: { n: 2, d: 5 }, right: { n: 4, d: 10 } };
+    }
+
+    function generateDifferentPair() {
+      for (let guard = 0; guard < 300; guard += 1) {
+        const left = randomFraction();
+        const right = randomFraction(left.d);
+        const rl = reduceFraction(left.n, left.d);
+        const rr = reduceFraction(right.n, right.d);
+        if (rl.n === rr.n && rl.d === rr.d) continue;
+        const diff = Math.abs(left.n / left.d - right.n / right.d);
+        if (diff >= 1 / 60) {
+          return { left, right };
+        }
+      }
+      return { left: { n: 3, d: 8 }, right: { n: 5, d: 12 } };
+    }
+
+    function compareSign(left, right) {
+      const ln = left.n * right.d;
+      const rn = right.n * left.d;
+      if (ln < rn) return "<";
+      if (ln > rn) return ">";
+      return "=";
+    }
+
+    function chooseQuestion() {
+      let pair = Math.random() < 0.5 ? generateEquivalentPair() : generateDifferentPair();
+      if (pair.left.d === pair.right.d) {
+        return chooseQuestion();
+      }
+      return {
+        left: pair.left,
+        right: pair.right,
+        correctAnswer: compareSign(pair.left, pair.right)
+      };
+    }
+
+    function gridForDenominator(d) {
+      let bestRows = 1;
+      let bestCols = d;
+      let bestGap = d;
+      for (let r = 1; r <= Math.sqrt(d); r += 1) {
+        if (d % r !== 0) continue;
+        const c = d / r;
+        const gap = Math.abs(c - r);
+        if (gap < bestGap) {
+          bestRows = r;
+          bestCols = c;
+          bestGap = gap;
+        }
+      }
+      return { rows: bestRows, cols: bestCols };
+    }
+
+    function renderFigure(target, frac) {
+      const { rows, cols } = gridForDenominator(frac.d);
+      target.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
+      target.style.gridTemplateRows = `repeat(${rows}, 1fr)`;
+      target.innerHTML = "";
+      for (let i = 0; i < frac.d; i += 1) {
+        const cell = document.createElement("div");
+        cell.className = "cf-cell" + (i < frac.n ? " is-fill" : "");
+        target.appendChild(cell);
+      }
+    }
+
+    function updateLabels() {
+      roundLabel.textContent = "문제 " + round + " / " + TOTAL_ROUNDS;
+      scoreLabel.textContent = "점수 " + score;
+    }
+
+    function setButtonsDisabled(disabled) {
+      answerButtons.forEach((btn) => {
+        btn.disabled = disabled;
+      });
+    }
+
+    function loadQuestion() {
+      locked = false;
+      setButtonsDisabled(false);
+      feedback.className = "cf-feedback";
+      feedback.textContent = "<, =, > 중 하나를 선택해 보세요.";
+      current = chooseQuestion();
+      leftNum.textContent = current.left.n;
+      leftDen.textContent = current.left.d;
+      rightNum.textContent = current.right.n;
+      rightDen.textContent = current.right.d;
+      renderFigure(leftFigure, current.left);
+      renderFigure(rightFigure, current.right);
+    }
+
+    function nextRound() {
+      if (round >= TOTAL_ROUNDS) {
+        locked = true;
+        setButtonsDisabled(true);
+        feedback.className = "cf-feedback good";
+        feedback.textContent = "게임 완료! 최종 점수는 " + score + " / " + TOTAL_ROUNDS + "점입니다.";
+        return;
+      }
+      round += 1;
+      loadQuestion();
+    }
+
+    function formatAnswer(sign) {
+      if (sign === "<") return "왼쪽 < 오른쪽";
+      if (sign === ">") return "왼쪽 > 오른쪽";
+      return "왼쪽 = 오른쪽";
+    }
+
+    function handleAnswer(userAnswer) {
+      if (locked) return;
+      locked = true;
+      setButtonsDisabled(true);
+      const correct = userAnswer === current.correctAnswer;
+      if (correct) {
+        score += 1;
+        correctAudio.currentTime = 0;
+        correctAudio.play().catch(() => {});
+        feedback.className = "cf-feedback good";
+        feedback.textContent = "정답! 크기 비교가 정확해요.";
+      } else {
+        wrongAudio.currentTime = 0;
+        wrongAudio.play().catch(() => {});
+        feedback.className = "cf-feedback bad";
+        feedback.textContent = "오답! 정답은 " + formatAnswer(current.correctAnswer) + " 입니다.";
+      }
+      updateLabels();
+      setTimeout(nextRound, 900);
+    }
+
+    function resetGame() {
+      round = 1;
+      score = 0;
+      updateLabels();
+      loadQuestion();
+    }
+
+    btnLt.addEventListener("click", () => handleAnswer("<"));
+    btnEq.addEventListener("click", () => handleAnswer("="));
+    btnGt.addEventListener("click", () => handleAnswer(">"));
+    restartBtn.addEventListener("click", resetGame);
+
+    resetGame();
+  </script>
+</body>
+</html>
