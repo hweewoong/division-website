@@ -1,0 +1,843 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>글씨 연습 학습지 생성기</title>
+  <style>
+    @font-face {
+      font-family: "GangwonModuLight";
+      src:
+        url("https://cdn.jsdelivr.net/gh/fonts-archive/GangwonEduModu/GangwonEduModu-Light.woff2") format("woff2"),
+        url("assets/fonts/gangwon-modu-light.otf") format("opentype");
+      font-display: swap;
+    }
+
+    @font-face {
+      font-family: "GangwonEduAllOTFLight";
+      src:
+        url("https://cdn.jsdelivr.net/gh/fonts-archive/GangwonEduModu/GangwonEduModu-Light.woff2") format("woff2"),
+        url("assets/fonts/gangwon-modu-light.otf") format("opentype");
+      font-display: swap;
+    }
+
+    @font-face {
+      font-family: "GangwonModuBold";
+      src:
+        url("https://cdn.jsdelivr.net/gh/fonts-archive/GangwonEduModu/GangwonEduModu-Bold.woff2") format("woff2"),
+        url("assets/fonts/gangwon-modu-bold.otf") format("opentype");
+      font-display: swap;
+    }
+
+    @font-face {
+      font-family: "GangwonEduAllOTFBold";
+      src:
+        url("https://cdn.jsdelivr.net/gh/fonts-archive/GangwonEduModu/GangwonEduModu-Bold.woff2") format("woff2"),
+        url("assets/fonts/gangwon-modu-bold.otf") format("opentype");
+      font-display: swap;
+    }
+
+    @font-face {
+      font-family: "NanumSquareRound";
+      src: url("assets/fonts/nanum-square-round-regular.otf") format("opentype");
+      font-weight: 400;
+      font-display: swap;
+    }
+
+    @font-face {
+      font-family: "BookkMyeongjo2";
+      src: url("assets/fonts/bookk-myeongjo2.ttf") format("truetype");
+      font-weight: 400;
+      font-display: swap;
+    }
+
+    @font-face {
+      font-family: "ChosunGungseo";
+      src: url("assets/fonts/chosun-gungseo.ttf") format("truetype");
+      font-weight: 400;
+      font-display: swap;
+    }
+
+    :root {
+      --ink: #141414;
+      --muted: #646970;
+      --panel: #ffffff;
+      --page: #f3f5f7;
+      --line: #1d1d1f;
+      --guide: #a4a8ad;
+      --circle-size: 68%;
+      --circle-opacity: 0.9;
+      --practice-font: "GangwonEduAllOTFBold";
+      --practice-weight: 400;
+      --practice-size: 24pt;
+      --glyph-x: 0px;
+      --glyph-y: 0px;
+      --sheet-width: 210mm;
+      --sheet-height: 297mm;
+      --sheet-pad-x: 10mm;
+      --sheet-pad-y: 8mm;
+      --header-height: 28mm;
+      --grid-gap: 3mm;
+      --grid-height: calc(var(--sheet-height) - (var(--sheet-pad-y) * 2) - var(--header-height) - var(--grid-gap));
+      --cell-size: calc(var(--grid-height) / 14);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      background: var(--page);
+      font-family: "NanumSquareRound", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+
+    button,
+    input,
+    select,
+    textarea {
+      font: inherit;
+    }
+
+    .app {
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: minmax(320px, 380px) minmax(0, 1fr);
+    }
+
+    .controls {
+      height: 100vh;
+      overflow: auto;
+      padding: 22px;
+      background: #ffffff;
+      border-right: 1px solid #d9dde2;
+    }
+
+    .controls h1 {
+      margin: 0 0 18px;
+      font-size: 24px;
+      line-height: 1.25;
+    }
+
+    .section {
+      padding: 16px 0;
+      border-top: 1px solid #e4e7eb;
+    }
+
+    .section:first-of-type {
+      border-top: 0;
+      padding-top: 0;
+    }
+
+    .section-title {
+      margin: 0 0 12px;
+      font-size: 14px;
+      font-weight: 800;
+      color: #2c3238;
+    }
+
+    .field {
+      display: grid;
+      gap: 7px;
+      margin-bottom: 13px;
+    }
+
+    .field-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    label {
+      font-size: 13px;
+      font-weight: 700;
+      color: #343a40;
+    }
+
+    input,
+    select,
+    textarea {
+      width: 100%;
+      border: 1px solid #cbd2d9;
+      border-radius: 6px;
+      padding: 10px 11px;
+      color: var(--ink);
+      background: #fff;
+      outline: none;
+    }
+
+    textarea {
+      min-height: 88px;
+      resize: vertical;
+      line-height: 1.5;
+    }
+
+    input:focus,
+    select:focus,
+    textarea:focus {
+      border-color: #2b6cb0;
+      box-shadow: 0 0 0 3px rgba(43, 108, 176, 0.15);
+    }
+
+    input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      accent-color: #2f6f73;
+    }
+
+    input[type="range"] {
+      padding: 0;
+      accent-color: #2f6f73;
+    }
+
+    .check {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      margin-bottom: 12px;
+    }
+
+    .check label {
+      font-weight: 700;
+    }
+
+    .hint-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      padding-top: 6px;
+    }
+
+    .btn {
+      border: 0;
+      border-radius: 6px;
+      padding: 11px 12px;
+      font-weight: 800;
+      cursor: pointer;
+      color: white;
+      background: #2f6f73;
+    }
+
+    .btn.secondary {
+      color: #212529;
+      background: #e8ecef;
+    }
+
+    .preview {
+      height: 100vh;
+      overflow: auto;
+      padding: 28px;
+      display: grid;
+      place-items: start center;
+    }
+
+    .sheets {
+      display: grid;
+      gap: 18px;
+      justify-items: center;
+    }
+
+    .sheet {
+      width: var(--sheet-width);
+      height: var(--sheet-height);
+      display: grid;
+      grid-template-rows: var(--header-height) var(--grid-height) 1fr;
+      row-gap: var(--grid-gap);
+      background: #fff;
+      border: 1.5px solid #24323a;
+      padding: var(--sheet-pad-y) var(--sheet-pad-x);
+      box-shadow: 0 12px 30px rgba(31, 41, 55, 0.12);
+      overflow: hidden;
+      break-after: page;
+      page-break-after: always;
+    }
+
+    .sheet:last-child {
+      break-after: auto;
+      page-break-after: auto;
+    }
+
+    .sheet-header {
+      display: grid;
+      grid-template-columns: 24mm 1fr 52mm;
+      align-items: center;
+      gap: 5mm;
+      border-bottom: 2px solid #24323a;
+      height: var(--header-height);
+      padding: 0 0 3mm;
+    }
+
+    .mascot-frame {
+      width: 22mm;
+      height: 22mm;
+      display: grid;
+      place-items: center;
+    }
+
+    .mascot {
+      width: 21mm;
+      height: 21mm;
+      object-fit: contain;
+    }
+
+    .title-block {
+      min-width: 0;
+      display: grid;
+      gap: 1.5mm;
+    }
+
+    .sheet-kicker {
+      width: max-content;
+      padding: 1mm 2.5mm;
+      border: 1px solid #8ab4c3;
+      border-radius: 999px;
+      color: #2f6670;
+      background: #edf8fa;
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 0;
+    }
+
+    .sheet-title {
+      text-align: left;
+      font-size: 25px;
+      line-height: 1.2;
+      font-weight: 800;
+      word-break: keep-all;
+      overflow-wrap: anywhere;
+    }
+
+    .student-info {
+      display: grid;
+      align-content: center;
+      gap: 6px;
+      padding: 3mm;
+      border: 1.5px solid #24323a;
+      border-radius: 6px;
+      background: #fbfcfd;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .blank {
+      display: inline-block;
+      width: 34px;
+      border-bottom: 2px solid var(--line);
+      transform: translateY(-2px);
+    }
+
+    .name-blank {
+      display: inline-block;
+      width: 112px;
+      border-bottom: 2px solid var(--line);
+      transform: translateY(-2px);
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(10, var(--cell-size));
+      grid-template-rows: repeat(14, var(--cell-size));
+      width: max-content;
+      height: max-content;
+      justify-self: center;
+      border-top: 2px solid var(--line);
+      border-left: 2px solid var(--line);
+    }
+
+    .cell {
+      width: var(--cell-size);
+      height: var(--cell-size);
+      position: relative;
+      display: grid;
+      place-items: center;
+      overflow: hidden;
+      border-right: 2px solid var(--line);
+      border-bottom: 2px solid var(--line);
+    }
+
+    .cell::before,
+    .cell::after {
+      content: "";
+      position: absolute;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    .cell::before {
+      top: 0;
+      bottom: 0;
+      left: 50%;
+      border-left: 1px dashed var(--guide);
+    }
+
+    .cell::after {
+      left: 0;
+      right: 0;
+      top: 50%;
+      border-top: 1px dashed var(--guide);
+    }
+
+    .circle-guide {
+      width: var(--circle-size);
+      height: var(--circle-size);
+      border: 1.4px dashed var(--guide);
+      border-radius: 50%;
+      opacity: var(--circle-opacity);
+      position: absolute;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    .circle-disabled .circle-guide {
+      display: none;
+    }
+
+    .char {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      z-index: 1;
+      color: #050505;
+      font-family: var(--practice-font), "NanumSquareRound", sans-serif;
+      font-weight: var(--practice-weight);
+      font-size: var(--practice-size);
+      line-height: 1;
+      text-align: center;
+      white-space: nowrap;
+      transform: translate(calc(-50% + var(--glyph-x)), calc(-50% + var(--glyph-y)));
+    }
+
+    .char.copy {
+      color: #9da3aa;
+    }
+
+    .no-guide .cell::before,
+    .no-guide .cell::after {
+      display: none;
+    }
+
+    .font-preview {
+      font-size: 20px;
+      min-height: 48px;
+      display: grid;
+      place-items: center start;
+      padding: 8px 10px;
+      border: 1px solid #d7dce1;
+      border-radius: 6px;
+      background: #f8fafb;
+      font-family: var(--practice-font), "NanumSquareRound", sans-serif;
+      font-weight: var(--practice-weight);
+    }
+
+    @media (max-width: 1020px) {
+      .app {
+        grid-template-columns: 1fr;
+      }
+
+      .controls,
+      .preview {
+        height: auto;
+      }
+
+      .controls {
+        border-right: 0;
+        border-bottom: 1px solid #d9dde2;
+      }
+
+      .sheet {
+        width: var(--sheet-width);
+      }
+
+      .char {
+        font-size: var(--practice-size);
+      }
+    }
+
+    @media print {
+      body {
+        background: white;
+      }
+
+      .controls {
+        display: none;
+      }
+
+      .app,
+      .preview {
+        display: block;
+        height: auto;
+        padding: 0;
+        overflow: visible;
+      }
+
+      .sheets {
+        display: block;
+      }
+
+      .sheet {
+        width: var(--sheet-width);
+        height: var(--sheet-height);
+        box-shadow: none;
+        border: 2px solid #000;
+        page-break-inside: avoid;
+      }
+
+      @page {
+        size: A4;
+        margin: 0;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <aside class="controls">
+      <h1>글씨 연습 학습지 생성기</h1>
+
+      <section class="section">
+        <p class="section-title">기본 정보</p>
+        <div class="field">
+          <label for="title">학습지명</label>
+          <input id="title" type="text" value="하루 한 장 바른 글씨">
+        </div>
+        <div class="field">
+          <label for="school">학교명</label>
+          <input id="school" type="text" value="휘웅초">
+        </div>
+        <div class="field-row">
+          <div class="field">
+            <label for="grade">학년</label>
+            <input id="grade" type="number" min="1" max="6" value="1">
+          </div>
+          <div class="field">
+            <label for="classNum">반</label>
+            <input id="classNum" type="number" min="1" value="1">
+          </div>
+        </div>
+        <div class="field">
+          <label for="pageCount">만들 페이지 수</label>
+          <select id="pageCount">
+            <option value="1" selected>1장</option>
+            <option value="2">2장</option>
+            <option value="3">3장</option>
+            <option value="4">4장</option>
+            <option value="5">5장</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="practiceText">낱말 또는 문장</label>
+          <textarea id="practiceText" maxlength="70">가나다라마바사아자차카타파하</textarea>
+          <div class="hint-row">
+            <span>페이지 수에 맞춰 자동 제한됩니다.</span>
+            <strong><span id="count">0</span>/<span id="maxCount">70</span></strong>
+          </div>
+        </div>
+      </section>
+
+      <section class="section">
+        <p class="section-title">글씨체</p>
+        <div class="field">
+          <label for="fontSelect">폰트 선택</label>
+          <select id="fontSelect">
+            <option value="GangwonEduAllOTFBold|400">강원교육모두 Bold</option>
+            <option value="GangwonEduAllOTFLight|400">강원교육모두 Light</option>
+            <option value="NanumSquareRound|400">나눔스퀘어라운드 Regular</option>
+            <option value="BookkMyeongjo2|400">부크크명조2</option>
+            <option value="ChosunGungseo|400">조선궁서체</option>
+          </select>
+        </div>
+        <div id="fontPreview" class="font-preview">가나다 ABC 123</div>
+        <div class="field">
+          <div class="hint-row">
+            <label for="fontSize">글씨 크기</label>
+            <strong><span id="fontSizeValue">24</span>pt</strong>
+          </div>
+          <input id="fontSize" type="range" min="12" max="32" value="24">
+          <input id="fontSizeNumber" type="number" min="12" max="32" value="24" aria-label="글씨 크기 pt">
+        </div>
+      </section>
+
+      <section class="section">
+        <p class="section-title">가이드라인</p>
+        <div class="check">
+          <input id="crossGuide" type="checkbox" checked>
+          <label for="crossGuide">중앙 십자 점선</label>
+        </div>
+        <div class="check">
+          <input id="circleGuide" type="checkbox" checked>
+          <label for="circleGuide">중앙 원형 점선</label>
+        </div>
+        <div class="field">
+          <label for="guideColor">점선 색상</label>
+          <select id="guideColor">
+            <option value="#a4a8ad">얇은 회색</option>
+            <option value="#7d858d">진한 회색</option>
+            <option value="#8eb4d9">연한 파랑</option>
+            <option value="#d8a2a2">연한 빨강</option>
+          </select>
+        </div>
+        <div class="field">
+          <div class="hint-row">
+            <label for="circleSize">원 크기</label>
+            <strong><span id="circleSizeValue">68</span>%</strong>
+          </div>
+          <input id="circleSize" type="range" min="48" max="84" value="68">
+        </div>
+        <div class="field">
+          <div class="hint-row">
+            <label for="circleOpacity">원 선명도</label>
+            <strong><span id="circleOpacityValue">90</span>%</strong>
+          </div>
+          <input id="circleOpacity" type="range" min="25" max="100" value="90">
+        </div>
+      </section>
+
+      <section class="section">
+        <p class="section-title">쓰기 방식</p>
+        <div class="check">
+          <input id="copyMode" type="checkbox" checked>
+          <label for="copyMode">다음 줄에 회색 따라쓰기 글자 표시</label>
+        </div>
+        <div class="actions">
+          <button id="resetBtn" class="btn secondary" type="button">초기화</button>
+          <button id="printBtn" class="btn" type="button">PDF 저장</button>
+        </div>
+      </section>
+    </aside>
+
+    <section class="preview">
+      <div id="sheets" class="sheets"></div>
+    </section>
+  </main>
+
+  <script>
+    const rows = 14;
+    const cols = 10;
+    const charsPerPage = 70;
+    const chunksPerPage = rows / 2;
+    const state = {
+      title: document.getElementById("title"),
+      school: document.getElementById("school"),
+      grade: document.getElementById("grade"),
+      classNum: document.getElementById("classNum"),
+      pageCount: document.getElementById("pageCount"),
+      practiceText: document.getElementById("practiceText"),
+      fontSelect: document.getElementById("fontSelect"),
+      fontSize: document.getElementById("fontSize"),
+      crossGuide: document.getElementById("crossGuide"),
+      circleGuide: document.getElementById("circleGuide"),
+      guideColor: document.getElementById("guideColor"),
+      circleSize: document.getElementById("circleSize"),
+      circleOpacity: document.getElementById("circleOpacity"),
+      copyMode: document.getElementById("copyMode")
+    };
+
+    const sheets = document.getElementById("sheets");
+    const count = document.getElementById("count");
+    const maxCount = document.getElementById("maxCount");
+    const fontPreview = document.getElementById("fontPreview");
+    const fontSizeValue = document.getElementById("fontSizeValue");
+    const circleSizeValue = document.getElementById("circleSizeValue");
+    const circleOpacityValue = document.getElementById("circleOpacityValue");
+
+    const fontSettings = {
+      GangwonModuBold: { x: 0, y: 1 },
+      GangwonModuLight: { x: 0, y: 1 },
+      GangwonEduAllOTFBold: { x: 0, y: 1 },
+      GangwonEduAllOTFLight: { x: 0, y: 1 },
+      NanumSquareRound: { x: 0, y: 2 },
+      BookkMyeongjo2: { x: 0, y: 1 },
+      ChosunGungseo: { x: 0, y: 2 }
+    };
+
+    function chunkText(text) {
+      const chunks = [];
+      text.split("\n").forEach((line) => {
+        if (!line.length) {
+          chunks.push("");
+          return;
+        }
+
+        for (let index = 0; index < line.length; index += cols) {
+          chunks.push(line.slice(index, index + cols));
+        }
+      });
+      return chunks;
+    }
+
+    function getPageCount() {
+      return Math.max(1, Number(state.pageCount.value) || 1);
+    }
+
+    function getMaxChars() {
+      return getPageCount() * charsPerPage;
+    }
+
+    function makeCell(char, isCopy) {
+      const cell = document.createElement("div");
+      cell.className = "cell";
+
+      const circle = document.createElement("span");
+      circle.className = "circle-guide";
+      cell.appendChild(circle);
+
+      if (char) {
+        const [family, weight] = state.fontSelect.value.split("|");
+        const glyph = document.createElement("span");
+        glyph.className = isCopy ? "char copy" : "char";
+        glyph.textContent = char;
+        glyph.style.fontFamily = `"${family}", "NanumSquareRound", sans-serif`;
+        glyph.style.fontWeight = weight;
+        glyph.style.fontSize = `${state.fontSize.value}pt`;
+        cell.appendChild(glyph);
+      }
+
+      return cell;
+    }
+
+    function renderGrid(grid, pageChunks) {
+      const copyMode = state.copyMode.checked;
+      grid.innerHTML = "";
+
+      for (let row = 0; row < rows; row += 1) {
+        const sourceIndex = Math.floor(row / 2);
+        const isPracticeRow = row % 2 === 0;
+        const rowText = isPracticeRow || copyMode ? pageChunks[sourceIndex] || "" : "";
+
+        for (let col = 0; col < cols; col += 1) {
+          grid.appendChild(makeCell(rowText[col], !isPracticeRow && copyMode));
+        }
+      }
+    }
+
+    function makeSheet(pageIndex, pageCount, pageChunks) {
+      const sheet = document.createElement("article");
+      sheet.className = "sheet";
+      sheet.classList.toggle("no-guide", !state.crossGuide.checked);
+      sheet.classList.toggle("circle-disabled", !state.circleGuide.checked);
+
+      sheet.innerHTML = `
+        <header class="sheet-header">
+          <div class="mascot-frame">
+            <img class="mascot" src="assets/images/book-mascot.png" alt="">
+          </div>
+          <div class="title-block">
+            <div class="sheet-kicker"></div>
+            <div class="sheet-title"></div>
+          </div>
+          <div class="student-info">
+            <div><span class="class-line"></span> <span class="blank"></span> 번</div>
+            <div>이름: <span class="name-blank"></span></div>
+          </div>
+        </header>
+        <div class="grid"></div>
+      `;
+
+      sheet.querySelector(".sheet-kicker").textContent = `바른 글씨 연습 ${pageIndex + 1}/${pageCount}`;
+      sheet.querySelector(".sheet-title").textContent = state.title.value || "글씨 연습 학습지";
+      sheet.querySelector(".class-line").textContent = `${state.school.value || "00초"} ${state.grade.value || "0"}학년 ${state.classNum.value || "0"}반`;
+      renderGrid(sheet.querySelector(".grid"), pageChunks);
+
+      return sheet;
+    }
+
+    function renderSheets() {
+      const pageCount = getPageCount();
+      const chunks = chunkText(state.practiceText.value.trimEnd());
+      sheets.innerHTML = "";
+
+      for (let pageIndex = 0; pageIndex < pageCount; pageIndex += 1) {
+        const start = pageIndex * chunksPerPage;
+        const pageChunks = chunks.slice(start, start + chunksPerPage);
+        sheets.appendChild(makeSheet(pageIndex, pageCount, pageChunks));
+      }
+    }
+
+    function applyFont() {
+      const [family, weight] = state.fontSelect.value.split("|");
+      const setting = fontSettings[family] || { x: 0, y: 0 };
+      document.documentElement.style.setProperty("--practice-font", `"${family}"`);
+      document.documentElement.style.setProperty("--practice-weight", weight);
+      document.documentElement.style.setProperty("--practice-size", `${state.fontSize.value}pt`);
+      document.documentElement.style.setProperty("--glyph-x", `${setting.x}px`);
+      document.documentElement.style.setProperty("--glyph-y", `${setting.y}px`);
+      fontSizeValue.textContent = state.fontSize.value;
+      fontPreview.style.fontFamily = `"${family}", "NanumSquareRound", sans-serif`;
+      fontPreview.style.fontWeight = weight;
+    }
+
+    function render() {
+      const maxChars = getMaxChars();
+      state.practiceText.maxLength = maxChars;
+
+      if (state.practiceText.value.length > maxChars) {
+        state.practiceText.value = state.practiceText.value.slice(0, maxChars);
+      }
+
+      count.textContent = state.practiceText.value.length;
+      maxCount.textContent = maxChars;
+
+      document.documentElement.style.setProperty("--guide", state.guideColor.value);
+      document.documentElement.style.setProperty("--circle-size", `${state.circleSize.value}%`);
+      document.documentElement.style.setProperty("--circle-opacity", `${Number(state.circleOpacity.value) / 100}`);
+      circleSizeValue.textContent = state.circleSize.value;
+      circleOpacityValue.textContent = state.circleOpacity.value;
+
+      applyFont();
+      renderSheets();
+    }
+
+    Object.values(state).forEach((element) => {
+      element.addEventListener("input", render);
+      element.addEventListener("change", render);
+    });
+
+    document.getElementById("printBtn").addEventListener("click", () => {
+      document.fonts.ready.then(() => window.print());
+    });
+
+    document.getElementById("resetBtn").addEventListener("click", () => {
+      state.title.value = "하루 한 장 바른 글씨";
+      state.school.value = "휘웅초";
+      state.grade.value = "1";
+      state.classNum.value = "1";
+      state.pageCount.value = "1";
+      state.practiceText.value = "가나다라마바사아자차카타파하";
+      state.fontSelect.value = "GangwonEduAllOTFBold|400";
+      state.fontSize.value = "24";
+      document.getElementById("fontSizeNumber").value = "24";
+      state.crossGuide.checked = true;
+      state.circleGuide.checked = true;
+      state.guideColor.value = "#a4a8ad";
+      state.circleSize.value = "68";
+      state.circleOpacity.value = "90";
+      state.copyMode.checked = true;
+      render();
+    });
+
+    state.fontSize.addEventListener("input", () => {
+      document.getElementById("fontSizeNumber").value = state.fontSize.value;
+    });
+
+    document.getElementById("fontSizeNumber").addEventListener("input", (event) => {
+      const value = Math.min(32, Math.max(12, Number(event.target.value) || 24));
+      state.fontSize.value = String(value);
+      event.target.value = String(value);
+      render();
+    });
+
+    document.fonts.ready.then(render);
+    render();
+  </script>
+</body>
+</html>
